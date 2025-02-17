@@ -6,7 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EF81F4022D62EBF50089E9D3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF81F33B2D62D77A0089E9D3 /* WidgetKit.framework */; };
+		EF81F4032D62EBF50089E9D3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF81F33D2D62D77A0089E9D3 /* SwiftUI.framework */; };
+		EF81F4102D62EBF60089E9D3 /* BudgetDetailsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EF81F4012D62EBF50089E9D3 /* BudgetDetailsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		EF81F40E2D62EBF60089E9D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EFC12D272D5AE12C00E829B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EF81F4002D62EBF50089E9D3;
+			remoteInfo = BudgetDetailsWidgetExtension;
+		};
 		EFC12D412D5AE12C00E829B3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EFC12D272D5AE12C00E829B3 /* Project object */;
@@ -23,15 +36,60 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		EF81F34E2D62D77C0089E9D3 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				EF81F4102D62EBF60089E9D3 /* BudgetDetailsWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		EF81F33B2D62D77A0089E9D3 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		EF81F33D2D62D77A0089E9D3 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		EF81F4012D62EBF50089E9D3 /* BudgetDetailsWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BudgetDetailsWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFC12D2F2D5AE12C00E829B3 /* Buzzkill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Buzzkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFC12D402D5AE12C00E829B3 /* BuzzkillTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BuzzkillTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFC12D4A2D5AE12C00E829B3 /* BuzzkillUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BuzzkillUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		EF7A59F22D5D5C3600FE2D10 /* Exceptions for "Buzzkill" folder in "Buzzkill" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EFC12D2E2D5AE12C00E829B3 /* Buzzkill */;
+		};
+		EF81F4142D62EBF60089E9D3 /* Exceptions for "BudgetDetailsWidget" folder in "BudgetDetailsWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EF81F4002D62EBF50089E9D3 /* BudgetDetailsWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		EF81F4042D62EBF50089E9D3 /* BudgetDetailsWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EF81F4142D62EBF60089E9D3 /* Exceptions for "BudgetDetailsWidget" folder in "BudgetDetailsWidgetExtension" target */,
+			);
+			path = BudgetDetailsWidget;
+			sourceTree = "<group>";
+		};
 		EFC12D312D5AE12C00E829B3 /* Buzzkill */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EF7A59F22D5D5C3600FE2D10 /* Exceptions for "Buzzkill" folder in "Buzzkill" target */,
+			);
 			path = Buzzkill;
 			sourceTree = "<group>";
 		};
@@ -48,6 +106,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		EF81F3FE2D62EBF50089E9D3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF81F4032D62EBF50089E9D3 /* SwiftUI.framework in Frameworks */,
+				EF81F4022D62EBF50089E9D3 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EFC12D2C2D5AE12C00E829B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -72,12 +139,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EF81F33A2D62D77A0089E9D3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EF81F33B2D62D77A0089E9D3 /* WidgetKit.framework */,
+				EF81F33D2D62D77A0089E9D3 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		EFC12D262D5AE12C00E829B3 = {
 			isa = PBXGroup;
 			children = (
 				EFC12D312D5AE12C00E829B3 /* Buzzkill */,
 				EFC12D432D5AE12C00E829B3 /* BuzzkillTests */,
 				EFC12D4D2D5AE12C00E829B3 /* BuzzkillUITests */,
+				EF81F4042D62EBF50089E9D3 /* BudgetDetailsWidget */,
+				EF81F33A2D62D77A0089E9D3 /* Frameworks */,
 				EFC12D302D5AE12C00E829B3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +166,7 @@
 				EFC12D2F2D5AE12C00E829B3 /* Buzzkill.app */,
 				EFC12D402D5AE12C00E829B3 /* BuzzkillTests.xctest */,
 				EFC12D4A2D5AE12C00E829B3 /* BuzzkillUITests.xctest */,
+				EF81F4012D62EBF50089E9D3 /* BudgetDetailsWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,6 +174,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		EF81F4002D62EBF50089E9D3 /* BudgetDetailsWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EF81F4112D62EBF60089E9D3 /* Build configuration list for PBXNativeTarget "BudgetDetailsWidgetExtension" */;
+			buildPhases = (
+				EF81F3FD2D62EBF50089E9D3 /* Sources */,
+				EF81F3FE2D62EBF50089E9D3 /* Frameworks */,
+				EF81F3FF2D62EBF50089E9D3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				EF81F4042D62EBF50089E9D3 /* BudgetDetailsWidget */,
+			);
+			name = BudgetDetailsWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = BudgetDetailsWidgetExtension;
+			productReference = EF81F4012D62EBF50089E9D3 /* BudgetDetailsWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		EFC12D2E2D5AE12C00E829B3 /* Buzzkill */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EFC12D542D5AE12C00E829B3 /* Build configuration list for PBXNativeTarget "Buzzkill" */;
@@ -102,10 +203,12 @@
 				EFC12D2B2D5AE12C00E829B3 /* Sources */,
 				EFC12D2C2D5AE12C00E829B3 /* Frameworks */,
 				EFC12D2D2D5AE12C00E829B3 /* Resources */,
+				EF81F34E2D62D77C0089E9D3 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EF81F40F2D62EBF60089E9D3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				EFC12D312D5AE12C00E829B3 /* Buzzkill */,
@@ -173,6 +276,9 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					EF81F4002D62EBF50089E9D3 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					EFC12D2E2D5AE12C00E829B3 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -203,11 +309,19 @@
 				EFC12D2E2D5AE12C00E829B3 /* Buzzkill */,
 				EFC12D3F2D5AE12C00E829B3 /* BuzzkillTests */,
 				EFC12D492D5AE12C00E829B3 /* BuzzkillUITests */,
+				EF81F4002D62EBF50089E9D3 /* BudgetDetailsWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		EF81F3FF2D62EBF50089E9D3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EFC12D2D2D5AE12C00E829B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -232,6 +346,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		EF81F3FD2D62EBF50089E9D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EFC12D2B2D5AE12C00E829B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -256,6 +377,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		EF81F40F2D62EBF60089E9D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EF81F4002D62EBF50089E9D3 /* BudgetDetailsWidgetExtension */;
+			targetProxy = EF81F40E2D62EBF60089E9D3 /* PBXContainerItemProxy */;
+		};
 		EFC12D422D5AE12C00E829B3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = EFC12D2E2D5AE12C00E829B3 /* Buzzkill */;
@@ -269,6 +395,65 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		EF81F4122D62EBF60089E9D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GFR22H29TJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BudgetDetailsWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BudgetDetailsWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = buzzkill.Buzzkill.BudgetDetailsWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EF81F4132D62EBF60089E9D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GFR22H29TJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BudgetDetailsWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BudgetDetailsWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = buzzkill.Buzzkill.BudgetDetailsWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		EFC12D522D5AE12C00E829B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -389,13 +574,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Buzzkill/Buzzkill.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Buzzkill/Preview Content\"";
 				DEVELOPMENT_TEAM = GFR22H29TJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = /Users/joshcastro/Desktop/BuzzkillIOS/Buzzkill/Buzzkill/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -406,7 +593,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -428,13 +615,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Buzzkill/Buzzkill.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Buzzkill/Preview Content\"";
 				DEVELOPMENT_TEAM = GFR22H29TJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = /Users/joshcastro/Desktop/BuzzkillIOS/Buzzkill/Buzzkill/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -445,7 +634,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -554,6 +743,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EF81F4112D62EBF60089E9D3 /* Build configuration list for PBXNativeTarget "BudgetDetailsWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EF81F4122D62EBF60089E9D3 /* Debug */,
+				EF81F4132D62EBF60089E9D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		EFC12D2A2D5AE12C00E829B3 /* Build configuration list for PBXProject "Buzzkill" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

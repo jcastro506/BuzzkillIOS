@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct BuzzkillApp: App {
+    @StateObject private var budgetModel = BudgetModel() // ✅ Shared Data Model
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(budgetModel)
         }
     }
 }

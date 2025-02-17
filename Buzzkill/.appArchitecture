@@ -1,0 +1,66 @@
+BudgetApp/
+│
+├── Models/
+│   ├── User.swift
+│   ├── Budget.swift
+│   ├── Transaction.swift
+│   ├── PastBudget.swift
+│   ├── ChatMessage.swift
+│   ├── Friend.swift
+│   ├── Notification.swift
+│   ├── Profile.swift
+│   ├── PlaidAccount.swift
+│   └── PlaidTransaction.swift
+│
+├── Views/
+│   ├── OnboardingView.swift
+│   ├── SignupView.swift
+│   ├── LoginView.swift
+│   ├── HomeView.swift
+│   ├── SetupBudgetView.swift
+│   ├── ChatView.swift
+│   ├── FriendsView.swift
+│   ├── SplashScreen.swift
+│   ├── NotificationView.swift
+│   ├── ProfileView.swift
+│   └── MainTabView.swift
+│
+├── ViewModels/
+│   ├── OnboardingViewModel.swift
+│   ├── SignupViewModel.swift
+│   ├── LoginViewModel.swift
+│   ├── HomeViewModel.swift
+│   ├── SetupBudgetViewModel.swift
+│   ├── ChatViewModel.swift
+│   ├── FriendsViewModel.swift
+│   ├── NotificationViewModel.swift
+│   ├── ProfileViewModel.swift
+│   └── PlaidViewModel.swift
+│
+├── Services/
+│   ├── AuthService.swift
+│   ├── BudgetService.swift
+│   ├── ChatService.swift
+│   ├── FriendService.swift
+│   ├── NotificationService.swift
+│   ├── ProfileService.swift
+│   └── PlaidService.swift
+│
+├── Components/
+│   ├── ButtonComponent.swift
+│   ├── TextFieldComponent.swift
+│   ├── CardViewComponent.swift
+│   └── NotificationBannerComponent.swift
+│
+├── LiveActivities/
+│   ├── BudgetLiveActivity.swift
+│   ├── NotificationLiveActivity.swift
+│   └── ProfileLiveActivity.swift
+│
+├── Utilities/
+│   ├── Constants.swift
+│   └── Extensions.swift
+│
+└── Resources/
+    ├── Assets.xcassets
+    └── Localizable.strings
