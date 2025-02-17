@@ -1,52 +1,35 @@
 import SwiftUI
 
 struct RootView: View {
-    @State private var isUserNew = true // Assume a new user by default
-    @State private var isUserSignedIn = false
     @State private var isOnboardingComplete = false
-    @State private var isCardConnectionComplete = false // New state variable
+    @State private var isCardConnectionComplete = false
     @EnvironmentObject var budgetModel: BudgetModel
+    @EnvironmentObject var authService: AuthService
     @State private var selectedTab = 0
-    @State private var showSplashScreen = true // New state variable for splash screen
+    @State private var showSplashScreen = true
 
     var body: some View {
         Group {
             if showSplashScreen {
                 SplashScreen()
                     .onAppear {
-                        // Simulate a delay for the splash screen
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                             showSplashScreen = false
                         }
                     }
-            } else if isUserSignedIn {
+            } else if let user = authService.user {
+                // User is signed in
                 MainTabView(selectedTab: $selectedTab)
-            } else if isUserNew {
-                SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isUserNew)
+            } else {
+                // User is not signed in
+                SignUpView(isUserSignedIn: .constant(false), isNewUser: .constant(true))
                     .onAppear {
                         print("Displaying SignUpView for new user")
                     }
-            } else if !isOnboardingComplete {
-                OnboardingView(isOnboardingComplete: $isOnboardingComplete)
-                    .onAppear {
-                        print("Displaying OnboardingView")
-                    }
-            } else if !isCardConnectionComplete { // Check if card connection is not complete
-                ConnectCardView {
-                    isCardConnectionComplete = true // Set to true when card connection is complete
-                }
-                .onAppear {
-                    print("Displaying ConnectCardView")
-                }
-            } else {
-                // LoginView(isLoginSuccessful: $isUserSignedIn)
-                //     .onAppear {
-                //         print("Displaying LoginView for existing user")
-                //     }
-                MainTabView(selectedTab: $selectedTab)
             }
         }
         .environmentObject(budgetModel)
+        .environmentObject(authService)
         .preferredColorScheme(.dark)
     }
 }

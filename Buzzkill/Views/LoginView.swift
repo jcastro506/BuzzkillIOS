@@ -5,6 +5,8 @@ struct LoginView: View {
     @State private var password: String = ""
     @ObservedObject var viewModel = LoginViewModel()
     @Binding var isLoginSuccessful: Bool
+    @EnvironmentObject var authService: AuthService
+    @State private var isLoading: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -32,9 +34,16 @@ struct LoginView: View {
                 
                 // Login Button
                 Button(action: {
-                    viewModel.login(email: email, password: password)
-                    if viewModel.isAuthenticated {
-                        isLoginSuccessful = true
+                    isLoading = true
+                    authService.signIn(email: email, password: password) { result in
+                        isLoading = false
+                        switch result {
+                        case .success:
+                            isLoginSuccessful = true
+                        case .failure(let error):
+                            // Handle error (e.g., show an alert)
+                            print("Login failed: \(error.localizedDescription)")
+                        }
                     }
                 }) {
                     Text("Login")
@@ -53,6 +62,13 @@ struct LoginView: View {
                         )
                 }
                 .padding(.top, 20)
+                
+                // Show ProgressView when loading
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .padding(.top, 10)
+                }
                 
                 Spacer()
             }
@@ -74,5 +90,6 @@ struct LoginView_Previews: PreviewProvider {
     
     static var previews: some View {
         LoginView(isLoginSuccessful: $isLoginSuccessful)
+            .environmentObject(AuthService())
     }
 } 

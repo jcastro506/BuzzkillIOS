@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SignUpView: View {
+    @EnvironmentObject var authService: AuthService
     @State private var isOnboardingComplete: Bool = false
     @Binding var isUserSignedIn: Bool
     @Binding var isNewUser: Bool
@@ -56,13 +57,15 @@ struct SignUpView: View {
                 
                 // Sign Up Button
                 Button(action: {
-                    isNewUser = false
-                    if !isOnboardingComplete {
-                        // Navigate to OnboardingView
-                        isOnboardingComplete = true
-                    } else {
-                        // Automatically sign in the user after onboarding
-                        isUserSignedIn = true
+                    authService.register(email: email, password: password) { result in
+                        switch result {
+                        case .success:
+                            isUserSignedIn = true
+                            isNewUser = false
+                        case .failure(let error):
+                            // Handle error (e.g., show an alert)
+                            print("Signup failed: \(error.localizedDescription)")
+                        }
                     }
                 }) {
                     Text("Sign Up Free")

@@ -6,6 +6,7 @@ struct ProfileView: View {
     @State private var profileImage: Image? = Image(systemName: "person.circle.fill")
     @State private var totalSpent: Double = 520.75
     @State private var avgSpentPerNight: Double = 43.39
+    @EnvironmentObject var authService: AuthService
     
     var body: some View {
         ZStack {
@@ -133,7 +134,14 @@ struct ProfileView: View {
                     
                     // Logout Button
                     Button(action: {
-                        // TODO: Implement logout functionality
+                        do {
+                            try authService.signOut()
+                            // Handle successful sign-out, e.g., navigate to login screen
+                            print("User signed out successfully")
+                        } catch {
+                            // Handle sign-out error, e.g., show an alert
+                            print("Sign out failed: \(error.localizedDescription)")
+                        }
                     }) {
                         Text("Log Out")
                             .font(.headline)
@@ -174,5 +182,6 @@ struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView()
             .preferredColorScheme(.dark)
+            .environmentObject(AuthService())
     }
 }

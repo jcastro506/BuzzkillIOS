@@ -65,7 +65,8 @@ struct BudgetDetailsWidget: Widget {
             if #available(iOS 17.0, *) {
                 BudgetDetailsWidgetEntryView(entry: entry)
                     .containerBackground(.fill.tertiary, for: .widget)
-            } else {
+            }
+            else {
                 BudgetDetailsWidgetEntryView(entry: entry)
                     .padding()
                     .background()
@@ -75,6 +76,7 @@ struct BudgetDetailsWidget: Widget {
         .description("This is an example widget.")
     }
 }
+
 
 #Preview(as: .systemSmall) {
     BudgetDetailsWidget()
