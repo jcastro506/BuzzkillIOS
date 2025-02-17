@@ -3,7 +3,6 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
-    @ObservedObject var viewModel = LoginViewModel()
     @Binding var isLoginSuccessful: Bool
     @EnvironmentObject var authService: AuthService
     @State private var isLoading: Bool = false
@@ -14,7 +13,7 @@ struct LoginView: View {
                 Spacer()
                 
                 // Logo
-                Image(systemName: "lock.shield.fill") // Example system image
+                Image(systemName: "lock.shield.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 100)

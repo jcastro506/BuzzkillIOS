@@ -2,17 +2,24 @@ import Foundation
 
 class LoginViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
+    @Published var errorMessage: String?
+    
+    private var authService: AuthServiceProtocol
+    
+    init(authService: AuthServiceProtocol) {
+        self.authService = authService
+    }
     
     func login(email: String, password: String) {
-        // Simulate authentication logic
-        if !email.isEmpty && !password.isEmpty {
-            // Simulate successful login
-            isAuthenticated = true
-            print("Login successful for email: \(email)")
-        } else {
-            // Simulate login failure
-            isAuthenticated = false
-            print("Login failed. Email or password is empty.")
+        authService.signIn(email: email, password: password) { [weak self] result in
+            switch result {
+            case .success:
+                self?.isAuthenticated = true
+                self?.errorMessage = nil
+            case .failure(let error):
+                self?.isAuthenticated = false
+                self?.errorMessage = error.localizedDescription
+            }
         }
     }
 } 
