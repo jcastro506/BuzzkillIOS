@@ -285,4 +285,3 @@ struct SetBudgetView_Previews: PreviewProvider {
             .environmentObject(BudgetModel())
     }
 }
-

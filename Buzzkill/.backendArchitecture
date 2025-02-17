@@ -1,0 +1,68 @@
+# Backend Architecture for Buzzkill
+
+## Overview
+The backend architecture for Buzzkill is designed to support the application's core functionalities, including budget management, notifications, and social interactions with friends. The architecture is modular, allowing for scalability and easy maintenance.
+
+## Components
+
+### 1. API Gateway
+- **Purpose**: Acts as a single entry point for all client requests.
+- **Responsibilities**: Routing requests to appropriate services, authentication, and rate limiting.
+
+### 2. Authentication Service
+- **Purpose**: Manages user authentication and authorization.
+- **Technologies**: OAuth 2.0, JWT
+- **Responsibilities**: User login, token generation, and validation.
+
+### 3. Budget Management Service
+- **Purpose**: Handles all operations related to budget creation, updates, and tracking.
+- **Models**: BudgetModel
+- **Responsibilities**: CRUD operations for budgets, budget analytics.
+
+### 4. Notification Service
+- **Purpose**: Manages sending notifications to users.
+- **File Reference**: `Buzzkill/Services/NotificationService.swift`
+- **Responsibilities**: Sending push notifications, email alerts, and in-app notifications.
+
+### 5. Social Interaction Service
+- **Purpose**: Manages interactions between users, such as adding friends and sharing budgets.
+- **Models**: Friend
+- **Responsibilities**: Friend requests, sharing budgets, and social feeds.
+
+### 6. Data Storage
+- **Purpose**: Stores all application data.
+- **Technologies**: SQL/NoSQL databases
+- **Responsibilities**: Persistent storage for user data, budgets, and notifications.
+
+## Data Flow
+1. **User Authentication**: 
+   - User logs in via the API Gateway.
+   - Authentication Service validates credentials and issues a JWT.
+
+2. **Budget Management**:
+   - User requests budget data through the API Gateway.
+   - Budget Management Service processes the request and interacts with the Data Storage.
+
+3. **Notifications**:
+   - Notification Service listens for events (e.g., budget updates).
+   - Sends notifications to users via push or email.
+
+4. **Social Interactions**:
+   - Users interact with friends through the API Gateway.
+   - Social Interaction Service manages friend requests and shared budgets.
+
+## Security Considerations
+- **Data Encryption**: All sensitive data is encrypted in transit and at rest.
+- **Access Control**: Role-based access control is implemented to restrict access to sensitive operations.
+
+## Scalability
+- **Microservices Architecture**: Each service can be scaled independently based on load.
+- **Load Balancing**: Distributes incoming requests across multiple instances of services.
+
+## Monitoring and Logging
+- **Purpose**: Ensures system reliability and performance.
+- **Tools**: Use of monitoring tools like Prometheus, Grafana, and centralized logging with ELK stack.
+
+## Future Enhancements
+- **Machine Learning**: Implement predictive analytics for budget recommendations.
+- **API Versioning**: Introduce versioning to support backward compatibility. 
