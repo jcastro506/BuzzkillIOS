@@ -21,7 +21,7 @@ struct SetBudgetView: View {
 
     init(selectedTab: Binding<Int>, authService: AuthService) {
         self._selectedTab = selectedTab
-        let userId = authService.user?.id.uuidString ?? "defaultUserId" // Get userId from AuthService
+        let userId = authService.user?.id ?? "defaultUserId" // Use the user ID directly as a String
         self._setupBudgetViewModel = StateObject(wrappedValue: SetupBudgetViewModel(budgetModel: BudgetModel(), userId: userId))
     }
 
@@ -145,6 +145,9 @@ struct SetBudgetView: View {
                 Button(action: {
                     setupBudgetViewModel.lockInBudget() // Use SetupBudgetViewModel to lock in the budget
                     showConfirmationAlert = setupBudgetViewModel.showConfirmationAlert
+                    
+                    // Fetch user budgets after locking in the budget
+                    fetchUserBudgets()
                 }) {
                     Text("Lock it In")
                         .font(.headline)
@@ -202,6 +205,32 @@ struct SetBudgetView: View {
             print("Started Live Activity: \(activity.id)")
         } catch {
             print("Failed to start Live Activity: \(error.localizedDescription)")
+        }
+    }
+
+    private func fetchUserBudgets() {
+        guard let userId = authService.user?.id else {
+            print("User ID not available")
+            return
+        }
+
+        // Print the user's email
+        if let userEmail = authService.user?.email {
+            print("User Email: \(userEmail)")
+        } else {
+            print("User Email not available")
+        }
+
+        let db = Firestore.firestore()
+        db.collection("budgets").whereField("userId", isEqualTo: userId).getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error fetching budgets: \(error.localizedDescription)")
+            } else {
+                for document in querySnapshot!.documents {
+                    print("\(document.documentID) => \(document.data())")
+                    // Handle the fetched budgets as needed
+                }
+            }
         }
     }
 }

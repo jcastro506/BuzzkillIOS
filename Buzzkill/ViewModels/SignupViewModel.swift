@@ -23,7 +23,7 @@ class SignupViewModel: ObservableObject {
         }
         
         isLoading = true
-        authService.register(email: email, password: password) { [weak self] result in
+        authService.register(email: email, password: password, username: username) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {

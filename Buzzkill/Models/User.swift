@@ -1,7 +1,7 @@
 import Foundation
 
 struct User {
-    var id: UUID
+    var id: String
     var email: String
     var userName: String
     var createdAt: Date
@@ -13,7 +13,7 @@ struct User {
 
     func toDictionary() -> [String: Any] {
         return [
-            "id": id.uuidString,
+            "id": id,
             "email": email,
             "user_name": userName,
             "created_at": createdAt.timeIntervalSince1970, // Convert Date to timestamp

@@ -4,7 +4,7 @@ import FirebaseFirestore
 
 protocol AuthServiceProtocol {
     func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void)
-    func register(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void)
+    func register(email: String, password: String, username: String, completion: @escaping (Result<User, Error>) -> Void)
     // Add other methods as needed
 }
 
@@ -17,17 +17,16 @@ class AuthService: AuthServiceProtocol, ObservableObject {
             if let firebaseUser = firebaseUser {
                 // Map FirebaseAuth.User to your app's User model
                 let user = User(
-                    id: UUID(),
+                    id: firebaseUser.uid, // Use the Firebase user ID directly as a String
                     email: firebaseUser.email ?? "",
                     userName: firebaseUser.displayName ?? "",
-                    createdAt: Date(), // Assuming current date for new users
-                    friends: [], // Assuming empty list for new users
-                    totalAmountSpent: 0.0, // Assuming 0 for new users
-                    totalBudgetsSet: 0, // Assuming 0 for new users
-                    pastBudgets: [] // Initialize with an empty list of past budgets
+                    createdAt: Date(),
+                    friends: [],
+                    totalAmountSpent: 0.0,
+                    totalBudgetsSet: 0,
+                    pastBudgets: []
                 )
                 self?.user = user
-                // Call Firestore function here
             } else {
                 self?.user = nil
             }
@@ -42,14 +41,14 @@ class AuthService: AuthServiceProtocol, ObservableObject {
             } else if let firebaseUser = authResult?.user {
                 // Map FirebaseAuth.User to your app's User model
                 let user = User(
-                    id: UUID(),
+                    id: firebaseUser.uid, // Use the Firebase user ID directly as a String
                     email: firebaseUser.email ?? "",
                     userName: firebaseUser.displayName ?? "",
-                    createdAt: Date(), // Assuming current date for new users
-                    friends: [], // Assuming empty list for new users
-                    totalAmountSpent: 0.0, // Assuming 0 for new users
-                    totalBudgetsSet: 0, // Assuming 0 for new users
-                    pastBudgets: [] // Initialize with an empty list of past budgets
+                    createdAt: Date(),
+                    friends: [],
+                    totalAmountSpent: 0.0,
+                    totalBudgetsSet: 0,
+                    pastBudgets: []
                 )
                 completion(.success(user))
                 // Call Firestore function here
@@ -61,7 +60,7 @@ class AuthService: AuthServiceProtocol, ObservableObject {
         }
     }
 
-    func register(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func register(email: String, password: String, username: String, completion: @escaping (Result<User, Error>) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
             if let error = error {
                 print("Registration failed with error: \(error.localizedDescription)")
@@ -69,18 +68,18 @@ class AuthService: AuthServiceProtocol, ObservableObject {
             } else if let firebaseUser = authResult?.user {
                 // Map FirebaseAuth.User to your app's User model
                 let user = User(
-                    id: UUID(),
+                    id: firebaseUser.uid, // Use the Firebase user ID directly as a String
                     email: firebaseUser.email ?? "",
-                    userName: firebaseUser.displayName ?? "",
-                    createdAt: Date(), // Assuming current date for new users
-                    friends: [], // Assuming empty list for new users
-                    totalAmountSpent: 0.0, // Assuming 0 for new users
-                    totalBudgetsSet: 0, // Assuming 0 for new users
-                    pastBudgets: [] // Initialize with an empty list of past budgets
+                    userName: username, // Use the provided username
+                    createdAt: Date(),
+                    friends: [],
+                    totalAmountSpent: 0.0,
+                    totalBudgetsSet: 0,
+                    pastBudgets: []
                 )
                 
                 // Add user to Firestore
-                self?.db.collection("users").document(user.id.uuidString).setData(user.toDictionary()) { error in
+                self?.db.collection("users").document(user.id).setData(user.toDictionary()) { error in
                     if let error = error {
                         print("Error adding user to Firestore: \(error.localizedDescription)")
                         completion(.failure(error))
