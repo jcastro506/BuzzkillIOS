@@ -159,6 +159,20 @@ struct SetBudgetView: View {
                         .shadow(color: Color.blue.opacity(0.6), radius: 10, x: 0, y: 5)
                 }
                 .padding()
+
+                Button(action: {
+                    setupBudgetViewModel.cancelActiveBudget() // Call the cancel function
+                }) {
+                    Text("Cancel Transaction")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.red)
+                        .cornerRadius(10)
+                        .shadow(color: Color.red.opacity(0.6), radius: 10, x: 0, y: 5)
+                }
+                .padding()
             }
             .background(Color.black.edgesIgnoringSafeArea(.all))
             .alert(isPresented: $showInfoAlert) {
@@ -183,6 +197,13 @@ struct SetBudgetView: View {
                     dismissButton: .default(Text("OK")) {
                         selectedTab = 0 // Navigate to Home tab
                     }
+                )
+            }
+            .alert(isPresented: $setupBudgetViewModel.showActiveBudgetAlert) {
+                Alert(
+                    title: Text("Active Budget Exists"),
+                    message: Text("You already have an active budget. Please complete or cancel it before setting a new one."),
+                    dismissButton: .default(Text("OK"))
                 )
             }
         }
