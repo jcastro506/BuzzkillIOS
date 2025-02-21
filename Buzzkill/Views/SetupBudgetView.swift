@@ -2,11 +2,15 @@ import SwiftUI
 import CoreLocation
 import ActivityKit
 import WidgetKit
+import Firebase
 
 struct SetBudgetView: View {
     @Binding var selectedTab: Int
     @EnvironmentObject var budgetModel: BudgetModel // Access the shared data model
+    @EnvironmentObject var signupViewModel: SignupViewModel // Add this line to access SignupViewModel
+    @EnvironmentObject var authService: AuthService // Ensure AuthService is available
     @StateObject private var locationManager = LocationManager()
+    @StateObject private var setupBudgetViewModel: SetupBudgetViewModel // Remove initialization here
     @State private var budgetAmount: String = "50"
     @State private var overBudgetAlert: Bool = false
     @State private var autoStartBudget: Bool = false
@@ -14,6 +18,12 @@ struct SetBudgetView: View {
     @State private var showInfoAlert: Bool = false
     @State private var infoMessage: String = ""
     @State private var showConfirmationAlert: Bool = false
+
+    init(selectedTab: Binding<Int>, authService: AuthService) {
+        self._selectedTab = selectedTab
+        let userId = authService.user?.id.uuidString ?? "defaultUserId" // Get userId from AuthService
+        self._setupBudgetViewModel = StateObject(wrappedValue: SetupBudgetViewModel(budgetModel: BudgetModel(), userId: userId))
+    }
 
     var body: some View {
         NavigationView {
@@ -133,16 +143,8 @@ struct SetBudgetView: View {
                 }
 
                 Button(action: {
-                    if let amount = Double(budgetAmount) {
-                        budgetModel.budgetAmount = amount
-                        UserDefaults.standard.set(amount, forKey: "userBudget")
-                        
-                        // Start the Live Activity
-                        startBudgetLiveActivity(amount: amount)
-                        
-                        // Show confirmation alert
-                        showConfirmationAlert = true
-                    }
+                    setupBudgetViewModel.lockInBudget() // Use SetupBudgetViewModel to lock in the budget
+                    showConfirmationAlert = setupBudgetViewModel.showConfirmationAlert
                 }) {
                     Text("Lock it In")
                         .font(.headline)
@@ -277,11 +279,18 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 }
 
-struct SetBudgetView_Previews: PreviewProvider {
-    @State static var selectedTab = 0
+//struct SetBudgetView_Previews: PreviewProvider {
+//    @State static var selectedTab = 0
+//
+//    static var previews: some View {
+//        // Create a mock or test instance of AuthService
+//        let mockAuthService = AuthService() // Ensure this is properly initialized
+//        // If AuthService requires specific setup, do it here
+//        // e.g., mockAuthService.user = User(id: UUID(), name: "Test User")
+//
+//        SetBudgetView(selectedTab: $selectedTab, authService: mockAuthService)
+//            .environmentObject(BudgetModel())
+//            .environmentObject(SignupViewModel()) // Add this line if SignupViewModel is needed
+//    }
+//}
 
-    static var previews: some View {
-        SetBudgetView(selectedTab: $selectedTab)
-            .environmentObject(BudgetModel())
-    }
-}

@@ -19,10 +19,10 @@ struct RootView: View {
                     }
             } else if let user = authService.user {
                 // User is signed in
-                MainTabView(selectedTab: $selectedTab)
+                MainTabView(selectedTab: $selectedTab, authService: authService)
             } else {
                 // User is not signed in
-                SignUpView(isUserSignedIn: .constant(false), isNewUser: .constant(true))
+                SignUpView(isUserSignedIn: .constant(false), isNewUser: .constant(true), authService: authService)
                     .onAppear {
                         print("Displaying SignUpView for new user")
                     }

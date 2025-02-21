@@ -1,17 +1,16 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @EnvironmentObject var authService: AuthService
-    @State private var isOnboardingComplete: Bool = false
+    @StateObject private var viewModel: SignupViewModel
     @Binding var isUserSignedIn: Bool
     @Binding var isNewUser: Bool
     
-    // Add state properties for each text field
-    @State private var username: String = ""
-    @State private var email: String = ""
-    @State private var password: String = ""
-    @State private var confirmPassword: String = ""
-
+    init(isUserSignedIn: Binding<Bool>, isNewUser: Binding<Bool>, authService: AuthServiceProtocol) {
+        self._isUserSignedIn = isUserSignedIn
+        self._isNewUser = isNewUser
+        self._viewModel = StateObject(wrappedValue: SignupViewModel(authService: authService))
+    }
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
@@ -48,25 +47,16 @@ struct SignUpView: View {
                 
                 // Input fields
                 Group {
-                    CustomTextField(icon: "person.fill", placeholder: "Username", text: $username)
-                    CustomTextField(icon: "envelope.fill", placeholder: "Email", text: $email)
-                    CustomTextField(icon: "lock.fill", placeholder: "Password", text: $password, isSecure: true)
-                    CustomTextField(icon: "lock.fill", placeholder: "Confirm Password", text: $confirmPassword, isSecure: true)
+                    CustomTextField(icon: "person.fill", placeholder: "Username", text: $viewModel.username)
+                    CustomTextField(icon: "envelope.fill", placeholder: "Email", text: $viewModel.email)
+                    CustomTextField(icon: "lock.fill", placeholder: "Password", text: $viewModel.password, isSecure: true)
+                    CustomTextField(icon: "lock.fill", placeholder: "Confirm Password", text: $viewModel.confirmPassword, isSecure: true)
                 }
                 .padding(.horizontal, 20)
                 
                 // Sign Up Button
                 Button(action: {
-                    authService.register(email: email, password: password) { result in
-                        switch result {
-                        case .success:
-                            isUserSignedIn = true
-                            isNewUser = false
-                        case .failure(let error):
-                            // Handle error (e.g., show an alert)
-                            print("Signup failed: \(error.localizedDescription)")
-                        }
-                    }
+                    viewModel.signUp()
                 }) {
                     Text("Sign Up Free")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
@@ -85,11 +75,20 @@ struct SignUpView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
-                .background(
-                    NavigationLink(destination: OnboardingView(isOnboardingComplete: $isOnboardingComplete), isActive: $isOnboardingComplete) {
-                        EmptyView()
-                    }
-                )
+                
+                // Show error message if any
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding(.top, 10)
+                }
+                
+                // Show loading indicator
+                if viewModel.isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .padding(.top, 10)
+                }
                 
                 // Login Option
                 HStack {
@@ -168,6 +167,6 @@ struct SignUpView_Previews: PreviewProvider {
     @State static var isNewUser = true
     
     static var previews: some View {
-        SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isNewUser)
+        SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isNewUser, authService: AuthService())
     }
 }

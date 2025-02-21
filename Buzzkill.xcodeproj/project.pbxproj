@@ -12,10 +12,8 @@
 		EF81F4102D62EBF60089E9D3 /* BudgetDetailsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EF81F4012D62EBF50089E9D3 /* BudgetDetailsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EF81F4202D63D98D0089E9D3 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = EF81F41F2D63D98D0089E9D3 /* FirebaseAnalytics */; };
 		EF81F4222D63D98D0089E9D3 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = EF81F4212D63D98D0089E9D3 /* FirebaseAuth */; };
-		EF81F4242D63D98D0089E9D3 /* FirebaseAuthCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = EF81F4232D63D98D0089E9D3 /* FirebaseAuthCombine-Community */; };
 		EF81F4262D63D98D0089E9D3 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = EF81F4252D63D98D0089E9D3 /* FirebaseCrashlytics */; };
 		EF81F4282D63D98D0089E9D3 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = EF81F4272D63D98D0089E9D3 /* FirebaseFirestore */; };
-		EF81F42A2D63D98D0089E9D3 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = EF81F4292D63D98D0089E9D3 /* FirebaseFirestoreCombine-Community */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,8 +125,6 @@
 			files = (
 				EF81F4202D63D98D0089E9D3 /* FirebaseAnalytics in Frameworks */,
 				EF81F4262D63D98D0089E9D3 /* FirebaseCrashlytics in Frameworks */,
-				EF81F4242D63D98D0089E9D3 /* FirebaseAuthCombine-Community in Frameworks */,
-				EF81F42A2D63D98D0089E9D3 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				EF81F4282D63D98D0089E9D3 /* FirebaseFirestore in Frameworks */,
 				EF81F4222D63D98D0089E9D3 /* FirebaseAuth in Frameworks */,
 			);
@@ -229,10 +225,8 @@
 			packageProductDependencies = (
 				EF81F41F2D63D98D0089E9D3 /* FirebaseAnalytics */,
 				EF81F4212D63D98D0089E9D3 /* FirebaseAuth */,
-				EF81F4232D63D98D0089E9D3 /* FirebaseAuthCombine-Community */,
 				EF81F4252D63D98D0089E9D3 /* FirebaseCrashlytics */,
 				EF81F4272D63D98D0089E9D3 /* FirebaseFirestore */,
-				EF81F4292D63D98D0089E9D3 /* FirebaseFirestoreCombine-Community */,
 			);
 			productName = Buzzkill;
 			productReference = EFC12D2F2D5AE12C00E829B3 /* Buzzkill.app */;
@@ -603,7 +597,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = /Users/joshcastro/Desktop/BuzzkillIOS/Buzzkill/Buzzkill/Info.plist;
+				INFOPLIST_FILE = /Users/joshcastro/Desktop/BuzzkillIOS/BuzzkillIOS/Buzzkill/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -644,7 +638,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = /Users/joshcastro/Desktop/BuzzkillIOS/Buzzkill/Buzzkill/Info.plist;
+				INFOPLIST_FILE = /Users/joshcastro/Desktop/BuzzkillIOS/BuzzkillIOS/Buzzkill/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -833,11 +827,6 @@
 			package = EF81F41E2D63D98D0089E9D3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
 		};
-		EF81F4232D63D98D0089E9D3 /* FirebaseAuthCombine-Community */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = EF81F41E2D63D98D0089E9D3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = "FirebaseAuthCombine-Community";
-		};
 		EF81F4252D63D98D0089E9D3 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = EF81F41E2D63D98D0089E9D3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -847,11 +836,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EF81F41E2D63D98D0089E9D3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
-		};
-		EF81F4292D63D98D0089E9D3 /* FirebaseFirestoreCombine-Community */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = EF81F41E2D63D98D0089E9D3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = "FirebaseFirestoreCombine-Community";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

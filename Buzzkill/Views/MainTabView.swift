@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @Binding var selectedTab: Int
+    let authService: AuthService
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -12,7 +13,7 @@ struct MainTabView: View {
                 }
                 .tag(0)
 
-            SetBudgetView(selectedTab: $selectedTab)
+            SetBudgetView(selectedTab: $selectedTab, authService: authService)
                 .tabItem {
                     Image(systemName: "dollarsign.circle.fill")
                     Text("Budget")
@@ -38,8 +39,9 @@ struct MainTabView: View {
 
 struct MainTabView_Previews: PreviewProvider {
     @State static var selectedTab = 0
+    static let authService = AuthService()
 
     static var previews: some View {
-        MainTabView(selectedTab: $selectedTab)
+        MainTabView(selectedTab: $selectedTab, authService: authService)
     }
 } 

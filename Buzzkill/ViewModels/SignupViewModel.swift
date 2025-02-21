@@ -1,18 +1,73 @@
 import Foundation
+import Firebase
 
 class SignupViewModel: ObservableObject {
-    @Published var isRegistered: Bool = false
+    @Published var username: String = ""
+    @Published var email: String = ""
+    @Published var password: String = ""
+    @Published var confirmPassword: String = ""
     
-    func signUp(name: String, email: String, password: String) {
-        // Simulate registration logic
-        if !name.isEmpty && !email.isEmpty && !password.isEmpty {
-            // Simulate successful registration
-            isRegistered = true
-            print("Registration successful for name: \(name), email: \(email)")
-        } else {
-            // Simulate registration failure
-            isRegistered = false
-            print("Registration failed. Name, email, or password is empty.")
+    @Published var isRegistered: Bool = false
+    @Published var errorMessage: String?
+    @Published var isLoading: Bool = false
+    
+    private var authService: AuthServiceProtocol
+    
+    init(authService: AuthServiceProtocol) {
+        self.authService = authService
+    }
+    
+    func signUp() {
+        guard validateInputs() else {
+            return
         }
+        
+        isLoading = true
+        authService.register(email: email, password: password) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success:
+                    self?.isRegistered = true
+                    self?.errorMessage = nil
+                    print("Registration successful for name: \(self?.username ?? ""), email: \(self?.email ?? "")")
+                case .failure(let error):
+                    self?.isRegistered = false
+                    self?.errorMessage = error.localizedDescription
+                    print("Registration failed: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    private func validateInputs() -> Bool {
+        if username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty {
+            errorMessage = "All fields are required."
+            return false
+        }
+        
+        if password != confirmPassword {
+            errorMessage = "Passwords do not match."
+            return false
+        }
+        
+        if !isValidEmail(email) {
+            errorMessage = "Invalid email format."
+            return false
+        }
+        
+        if password.count < 6 {
+            errorMessage = "Password must be at least 6 characters long."
+            return false
+        }
+        
+        return true
+    }
+    
+    private func isValidEmail(_ email: String) -> Bool {
+        // Simple regex for email validation
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailPred.evaluate(with: email)
     }
 } 

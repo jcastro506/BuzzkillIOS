@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import CoreLocation
 import ActivityKit
+import FirebaseFirestore
 
 class SetupBudgetViewModel: ObservableObject {
     @Published var budgetAmount: String = "50"
@@ -14,9 +15,11 @@ class SetupBudgetViewModel: ObservableObject {
     
     var locationManager = LocationManager()
     var budgetModel: BudgetModel
+    var userId: String
 
-    init(budgetModel: BudgetModel) {
+    init(budgetModel: BudgetModel, userId: String) {
         self.budgetModel = budgetModel
+        self.userId = userId
     }
 
     func adjustBudget(by amount: Int) {
@@ -43,8 +46,33 @@ class SetupBudgetViewModel: ObservableObject {
         if let amount = Double(budgetAmount) {
             budgetModel.budgetAmount = amount
             UserDefaults.standard.set(amount, forKey: "userBudget")
+            saveBudgetToFirestore(amount: amount)
             startBudgetLiveActivity(amount: amount)
             showConfirmationAlert = true
+        }
+    }
+
+    func saveBudgetToFirestore(amount: Double) {
+        let db = Firestore.firestore()
+        let budget = Budget(
+            id: UUID(),
+            userId: userId,
+            totalAmount: amount,
+            spentAmount: 0.0,
+            name: "New Budget",
+            startDate: Date(),
+            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+            isRecurring: false,
+            status: "active",
+            transactions: []
+        )
+        
+        db.collection("budgets").document(budget.id.uuidString).setData(budget.toDictionary()) { error in
+            if let error = error {
+                print("Error saving budget: \(error.localizedDescription)")
+            } else {
+                print("Budget successfully saved!")
+            }
         }
     }
 
