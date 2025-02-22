@@ -33,11 +33,22 @@ class SignupRepository: SignupRepositoryProtocol {
         
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(userId)
-        userRef.setData([
-            "email": email,
-            "user_name": username,
-            "created_at": Date().timeIntervalSince1970
-        ]) { error in
+        
+        // Create a User instance with default values
+        let user = User(
+            id: userId,
+            email: email,
+            userName: username,
+            createdAt: Date(),
+            friends: [],
+            totalAmountSpent: 0.0,
+            totalBudgetsSet: 0,
+            pastBudgets: [],
+            currentBudget: nil // Initialize with nil or a default Budget
+        )
+        
+        // Use the toDictionary method to set data
+        userRef.setData(user.toDictionary()) { error in
             if let error = error {
                 completion(.failure(error))
             } else {

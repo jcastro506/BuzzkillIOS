@@ -3,6 +3,7 @@ import ActivityKit
 
 struct HomeView: View {
     @EnvironmentObject var budgetModel: BudgetModel // Access the shared data model
+    @EnvironmentObject var authService: AuthService // Access the authentication service
     @StateObject private var viewModel = HomeViewViewModel(budgetModel: BudgetModel()) // Temporary initialization
 
     var body: some View {
@@ -14,16 +15,28 @@ struct HomeView: View {
                     LazyVStack(spacing: 16) {
                         // Add a header to display the active budget
                         HStack {
-                            Text("Active Budget: $\(String(format: "%.2f", budgetModel.budgetAmount))")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 0)
+                            if let currentBudget = authService.user?.currentBudget {
+                                Text("Active Budget: $\(String(format: "%.2f", currentBudget.totalAmount))")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 0)
+                            } else {
+                                Text("No Active Budget")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 0)
+                            }
                             Spacer()
                         }
                         .padding(.top, 10)
                         
-                        BudgetProgressView(budget: budgetModel.budgetAmount, spent: viewModel.spent) // Use the shared budget amount
+                        if let currentBudget = authService.user?.currentBudget {
+                            BudgetProgressView(budget: currentBudget.totalAmount, spent: currentBudget.spentAmount)
+                        } else {
+                            BudgetProgressView(budget: 0, spent: 0)
+                        }
                         PastBudgetsView(
                             selectedPastBudget: $viewModel.selectedPastBudget,
                             showBudgetDetailModal: $viewModel.showBudgetDetailModal

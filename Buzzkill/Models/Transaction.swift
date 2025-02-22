@@ -18,4 +18,25 @@ struct Transaction: Identifiable, Equatable {
             "name": name
         ]
     }
+
+    static func fromDictionary(_ dict: [String: Any]) -> Transaction? {
+        guard let idString = dict["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let amount = dict["amount"] as? Double,
+              let dateTimestamp = dict["date"] as? TimeInterval,
+              let description = dict["description"] as? String,
+              let name = dict["name"] as? String else {
+            return nil
+        }
+
+        let date = Date(timeIntervalSince1970: dateTimestamp)
+
+        return Transaction(
+            id: id,
+            amount: amount,
+            date: date,
+            description: description,
+            name: name
+        )
+    }
 } 

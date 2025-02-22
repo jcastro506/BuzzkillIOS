@@ -9,10 +9,11 @@ struct User {
     var totalAmountSpent: Double
     var totalBudgetsSet: Int
     var pastBudgets: [PastBudget] // Add this line to include a list of past budgets
+    var currentBudget: Budget? // Add this line
     // Add other user properties here
 
     func toDictionary() -> [String: Any] {
-        return [
+        var dict: [String: Any] = [
             "id": id,
             "email": email,
             "user_name": userName,
@@ -23,5 +24,11 @@ struct User {
             "past_budgets": pastBudgets.map { $0.toDictionary() }, // Convert budgets to dictionary if needed
             // Add other properties here
         ]
+        
+        if let currentBudget = currentBudget {
+            dict["current_budget"] = currentBudget.toDictionary() // Convert current budget to dictionary
+        }
+        
+        return dict
     }
 } 

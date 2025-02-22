@@ -134,11 +134,7 @@ struct SetBudgetView: View {
                 }
 
                 Button(action: {
-                    setupBudgetViewModel.lockInBudget()
-                    setupBudgetViewModel.showConfirmationAlert = setupBudgetViewModel.showConfirmationAlert
-                    
-                    // Fetch user budgets after locking in the budget
-                    setupBudgetViewModel.fetchUserBudgets(authService: authService)
+                    setupBudgetViewModel.lockInBudget(authService: authService)
                 }) {
                     Text("Lock it In")
                         .font(.headline)
@@ -152,7 +148,7 @@ struct SetBudgetView: View {
                 .padding()
 
                 Button(action: {
-                    setupBudgetViewModel.cancelActiveBudget()
+                    setupBudgetViewModel.cancelActiveBudget(authService: authService)
                 }) {
                     Text("Cancel Transaction")
                         .font(.headline)

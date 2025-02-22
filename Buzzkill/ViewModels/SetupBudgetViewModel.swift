@@ -48,35 +48,45 @@ class SetupBudgetViewModel: ObservableObject {
         }
     }
 
-    func lockInBudget() {
-        setupBudgetRepository.checkForActiveBudget(userId: userId) { [weak self] hasActiveBudget, error in
+    func lockInBudget(authService: AuthService) {
+        guard let user = authService.user else { return }
+        
+        if user.currentBudget != nil {
+            showActiveBudgetAlert = true
+        } else if let amount = Double(budgetAmount) {
+            let budget = Budget(
+                id: UUID(),
+                userId: user.id,
+                totalAmount: amount,
+                spentAmount: 0.0,
+                name: "New Budget",
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "active",
+                transactions: []
+            )
+            
+            saveBudget(budget: budget, authService: authService)
+        }
+    }
+
+    private func saveBudget(budget: Budget, authService: AuthService) {
+        setupBudgetRepository.saveBudgetToFirestore(budget: budget) { [weak self] error in
             if let error = error {
-                print("Error checking active budget: \(error.localizedDescription)")
-                return
-            }
-            if hasActiveBudget {
-                self?.showActiveBudgetAlert = true
-            } else if let amount = Double(self?.budgetAmount ?? "") {
-                self?.budgetModel.budgetAmount = amount
-                UserDefaults.standard.set(amount, forKey: "userBudget")
-                let budget = Budget(
-                    id: UUID(),
-                    userId: self?.userId ?? "",
-                    totalAmount: amount,
-                    spentAmount: 0.0,
-                    name: "New Budget",
-                    startDate: Date(),
-                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-                    isRecurring: false,
-                    status: "active",
-                    transactions: []
-                )
-                self?.setupBudgetRepository.saveBudgetToFirestore(budget: budget) { error in
+                print("Error saving budget: \(error.localizedDescription)")
+            } else {
+                // Update the local user object
+                authService.user?.currentBudget = budget
+                
+                // Update Firestore
+                let userRef = self?.db.collection("users").document(budget.userId)
+                userRef?.updateData([
+                    "current_budget": budget.toDictionary()
+                ]) { error in
                     if let error = error {
-                        print("Error saving budget: \(error.localizedDescription)")
+                        print("Error updating Firestore: \(error.localizedDescription)")
                     } else {
-                        print("Budget successfully saved!")
-                        self?.startBudgetLiveActivity(amount: amount)
                         self?.showConfirmationAlert = true
                     }
                 }
@@ -84,44 +94,36 @@ class SetupBudgetViewModel: ObservableObject {
         }
     }
 
-    private func startBudgetLiveActivity(amount: Double) {
-        let attributes = BudgetDetailsWidgetAttributes(name: "Buzzkill Budget")
-        let contentState = BudgetDetailsWidgetAttributes.ContentState(
-            totalBudget: amount,
-            amountSpent: 0.0,
-            amountRemaining: amount
+    func cancelActiveBudget(authService: AuthService) {
+        guard let user = authService.user, let currentBudget = user.currentBudget else { return }
+        
+        // Create a PastBudget from the current budget
+        let pastBudget = PastBudget(
+            barName: "Unknown", // Update with actual data if available
+            date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
+            budget: currentBudget,
+            transactions: currentBudget.transactions
         )
         
-        do {
-            let activity = try Activity<BudgetDetailsWidgetAttributes>.request(
-                attributes: attributes,
-                contentState: contentState,
-                pushType: nil
-            )
-            print("Started Live Activity: \(activity.id)")
-        } catch {
-            print("Failed to start Live Activity: \(error.localizedDescription)")
-        }
-    }
-
-    func cancelActiveBudget() {
-        setupBudgetRepository.cancelActiveBudget(userId: userId) { [weak self] error in
+        // Add the past budget to Firestore
+        setupBudgetRepository.addPastBudgetToUser(userId: user.id, pastBudget: pastBudget) { [weak self] error in
             if let error = error {
-                print("Error cancelling budget: \(error.localizedDescription)")
+                print("Error adding past budget: \(error.localizedDescription)")
             } else {
-                print("Budget successfully cancelled!")
-                // Assuming you have logic to create a PastBudget instance
-                let pastBudget = PastBudget(
-                    barName: "Unknown",
-                    date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
-                    budget: Budget(id: UUID(), userId: self?.userId ?? "", totalAmount: 0.0, spentAmount: 0.0, name: "Unknown", startDate: Date(), endDate: Date(), isRecurring: false, status: "cancelled", transactions: []),
-                    transactions: []
-                )
-                self?.setupBudgetRepository.addPastBudgetToUser(userId: self?.userId ?? "", pastBudget: pastBudget) { error in
+                print("Past budget successfully added!")
+                
+                // Remove the current budget
+                authService.user?.currentBudget = nil
+                
+                // Update Firestore
+                let userRef = self?.db.collection("users").document(user.id)
+                userRef?.updateData([
+                    "current_budget": FieldValue.delete()
+                ]) { error in
                     if let error = error {
-                        print("Error adding past budget: \(error.localizedDescription)")
+                        print("Error updating Firestore: \(error.localizedDescription)")
                     } else {
-                        print("Past budget successfully added!")
+                        print("Current budget successfully removed!")
                     }
                 }
             }
