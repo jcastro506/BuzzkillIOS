@@ -78,9 +78,9 @@ struct BudgetDetailsWidget: Widget {
 }
 
 
-#Preview(as: .systemSmall) {
-    BudgetDetailsWidget()
-} timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
-}
+//#Preview(as: .systemSmall) {
+//    BudgetDetailsWidget()
+//} timeline: {
+//    SimpleEntry(date: .now, emoji: "😀")
+//    SimpleEntry(date: .now, emoji: "🤩")
+//}

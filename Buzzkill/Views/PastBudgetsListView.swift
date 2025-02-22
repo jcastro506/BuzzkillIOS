@@ -1,12 +1,10 @@
 import SwiftUI
 
 struct PastBudgetsListView: View {
-    @EnvironmentObject var budgetModel: BudgetModel
+    @EnvironmentObject var authService: AuthService
+    @StateObject private var viewModel = PastBudgetsViewModel()
     @State private var selectedBudget: PastBudget?
     @State private var showBudgetDetail = false
-    @State private var isLoading = false
-    @State private var currentPage = 0
-    private let pageSize = 10
 
     // Define grid layout for two columns
     private let columns: [GridItem] = [
@@ -28,7 +26,7 @@ struct PastBudgetsListView: View {
                         .padding(.horizontal, 16)
 
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(budgetModel.pastBudgets) { budget in
+                        ForEach(viewModel.pastBudgets) { budget in
                             PastBudgetCard(budget: budget)
                                 .onTapGesture {
                                     withAnimation {
@@ -41,13 +39,13 @@ struct PastBudgetsListView: View {
                                 .padding(8)
                         }
 
-                        if isLoading {
+                        if viewModel.isLoading {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
                         } else {
                             Color.clear
                                 .onAppear {
-                                    loadMoreBudgets()
+                                    viewModel.loadMoreBudgets()
                                 }
                         }
                     }
@@ -59,67 +57,23 @@ struct PastBudgetsListView: View {
                         BudgetDetailView(budget: budget)
                     }
                 }
+
+                NavigationLink(destination: ProfileView(authService: authService)) {
+                    Text("Go to Profile")
+                }
             }
         }
         .onAppear {
-            if budgetModel.pastBudgets.isEmpty {
-                loadInitialBudgets()
+            if viewModel.pastBudgets.isEmpty {
+                viewModel.loadInitialBudgets()
             }
-        }
-    }
-
-    private func loadInitialBudgets() {
-        isLoading = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            budgetModel.pastBudgets = generateDummyBudgets(page: 0, size: pageSize)
-            isLoading = false
-        }
-    }
-
-    private func loadMoreBudgets() {
-        guard !isLoading else { return }
-        isLoading = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            let newBudgets = generateDummyBudgets(page: currentPage + 1, size: pageSize)
-            budgetModel.pastBudgets.append(contentsOf: newBudgets)
-            currentPage += 1
-            isLoading = false
-        }
-    }
-
-    private func generateDummyBudgets(page: Int, size: Int) -> [PastBudget] {
-        let barNames = [
-            "The Tipsy Tavern", "Neon Nights", "The Rusty Nail", 
-            "Moonlight Lounge", "The Happy Hour", "The Drunken Duck", 
-            "The Buzz Bar", "The Liquid Lounge", "The Velvet Room", 
-            "The Whiskey Way"
-        ]
-        
-        return (0..<size).map { index in
-            PastBudget(
-                barName: barNames[(page * size + index) % barNames.count],
-                date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
-                amountSpent: Double.random(in: 50...500),
-                budget: Double.random(in: 500...1000),
-                transactions: generateDummyTransactions()
-            )
-        }
-    }
-
-    private func generateDummyTransactions() -> [Transaction] {
-        return (0..<5).map { index in
-            Transaction(
-                id: UUID(),
-                amount: Double.random(in: 10...100),
-                date: Date(),
-                description: "Transaction \(index + 1)",
-                name: "Transaction Name \(index + 1)"
-            )
         }
     }
 }
 
 struct PastBudgetLiveViewHeaderView: View {
+    @EnvironmentObject var authService: AuthService
+
     var body: some View {
         HStack {
             Text("Buzzkill")
@@ -137,7 +91,7 @@ struct PastBudgetLiveViewHeaderView: View {
                         .foregroundColor(.white)
                 }
 
-                NavigationLink(destination: ProfileView()) {
+                NavigationLink(destination: ProfileView(authService: authService)) {
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .frame(width: 24, height: 24)
@@ -166,10 +120,10 @@ struct PastBudgetCard: View {
                 .foregroundColor(.secondary)
             
             HStack {
-                Text("Spent: \(budget.amountSpent, specifier: "%.2f")")
+                Text("Spent: \(budget.budget.spentAmount, specifier: "%.2f")")
                     .foregroundColor(.red)
                 Spacer()
-                Text("Budget: \(budget.budget, specifier: "%.2f")")
+                Text("Budget: \(budget.budget.totalAmount, specifier: "%.2f")")
                     .foregroundColor(.green)
             }
             .font(.footnote)
@@ -189,11 +143,27 @@ struct PastBudgetsListView_Previews: PreviewProvider {
     static var previews: some View {
         let sampleBudgetModel = BudgetModel()
         sampleBudgetModel.pastBudgets = [
-            PastBudget(barName: "Neon Lights Bar", date: "Feb 3, 2025", amountSpent: 80.00, budget: 100.00, transactions: [])
+            PastBudget(
+                barName: "Neon Lights Bar",
+                date: "Feb 3, 2025",
+                budget: Budget(
+                    id: UUID(),
+                    userId: "sampleUserId",
+                    totalAmount: 100.00,
+                    spentAmount: 80.00,
+                    name: "Neon Lights Bar",
+                    startDate: Date(),
+                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                    isRecurring: false,
+                    status: "completed",
+                    transactions: []
+                ),
+                transactions: []
+            )
         ]
         
         return PastBudgetsListView()
-            .environmentObject(sampleBudgetModel)
+            .environmentObject(AuthService())
             .preferredColorScheme(.dark)
     }
 }

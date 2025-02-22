@@ -15,18 +15,25 @@ class AuthService: AuthServiceProtocol, ObservableObject {
     init() {
         Auth.auth().addStateDidChangeListener { [weak self] auth, firebaseUser in
             if let firebaseUser = firebaseUser {
-                // Map FirebaseAuth.User to your app's User model
-                let user = User(
-                    id: firebaseUser.uid, // Use the Firebase user ID directly as a String
-                    email: firebaseUser.email ?? "",
-                    userName: firebaseUser.displayName ?? "",
-                    createdAt: Date(),
-                    friends: [],
-                    totalAmountSpent: 0.0,
-                    totalBudgetsSet: 0,
-                    pastBudgets: []
-                )
-                self?.user = user
+                // Fetch user data from Firestore
+                self?.db.collection("users").document(firebaseUser.uid).getDocument { document, error in
+                    if let document = document, document.exists {
+                        let data = document.data() ?? [:]
+                        let user = User(
+                            id: firebaseUser.uid,
+                            email: firebaseUser.email ?? "",
+                            userName: firebaseUser.displayName ?? "",
+                            createdAt: Date(timeIntervalSince1970: data["created_at"] as? TimeInterval ?? 0),
+                            friends: data["friends"] as? [String] ?? [],
+                            totalAmountSpent: data["total_amount_spent"] as? Double ?? 0.0,
+                            totalBudgetsSet: data["total_budgets_set"] as? Int ?? 0,
+                            pastBudgets: [] // Assuming you will fetch or handle past budgets separately
+                        )
+                        self?.user = user
+                    } else {
+                        self?.user = nil
+                    }
+                }
             } else {
                 self?.user = nil
             }
@@ -39,19 +46,27 @@ class AuthService: AuthServiceProtocol, ObservableObject {
                 print("Sign in failed with error: \(error.localizedDescription)")
                 completion(.failure(error))
             } else if let firebaseUser = authResult?.user {
-                // Map FirebaseAuth.User to your app's User model
-                let user = User(
-                    id: firebaseUser.uid, // Use the Firebase user ID directly as a String
-                    email: firebaseUser.email ?? "",
-                    userName: firebaseUser.displayName ?? "",
-                    createdAt: Date(),
-                    friends: [],
-                    totalAmountSpent: 0.0,
-                    totalBudgetsSet: 0,
-                    pastBudgets: []
-                )
-                completion(.success(user))
-                // Call Firestore function here
+                // Fetch user data from Firestore
+                self?.db.collection("users").document(firebaseUser.uid).getDocument { document, error in
+                    if let document = document, document.exists {
+                        let data = document.data() ?? [:]
+                        let user = User(
+                            id: firebaseUser.uid,
+                            email: data["email"] as? String ?? "",
+                            userName: data["user_name"] as? String ?? "",
+                            createdAt: Date(timeIntervalSince1970: data["created_at"] as? TimeInterval ?? 0),
+                            friends: data["friends"] as? [String] ?? [],
+                            totalAmountSpent: data["total_amount_spent"] as? Double ?? 0.0,
+                            totalBudgetsSet: data["total_budgets_set"] as? Int ?? 0,
+                            pastBudgets: [] // Assuming you will fetch or handle past budgets separately;
+                        )
+                        self?.user = user
+                        completion(.success(user))
+                    } else {
+                        print("User document does not exist")
+                        completion(.failure(NSError(domain: "AuthService", code: -1, userInfo: [NSLocalizedDescriptionKey: "User data not found"])))
+                    }
+                }
             } else {
                 let unknownError = NSError(domain: "AuthService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown sign-in error"])
                 print("Sign in failed with unknown error")
@@ -68,9 +83,9 @@ class AuthService: AuthServiceProtocol, ObservableObject {
             } else if let firebaseUser = authResult?.user {
                 // Map FirebaseAuth.User to your app's User model
                 let user = User(
-                    id: firebaseUser.uid, // Use the Firebase user ID directly as a String
+                    id: firebaseUser.uid,
                     email: firebaseUser.email ?? "",
-                    userName: username, // Use the provided username
+                    userName: username,
                     createdAt: Date(),
                     friends: [],
                     totalAmountSpent: 0.0,
@@ -85,6 +100,7 @@ class AuthService: AuthServiceProtocol, ObservableObject {
                         completion(.failure(error))
                     } else {
                         print("User successfully added to Firestore")
+                        self?.user = user
                         completion(.success(user))
                     }
                 }

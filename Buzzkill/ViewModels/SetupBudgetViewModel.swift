@@ -3,6 +3,8 @@ import SwiftUI
 import CoreLocation
 import ActivityKit
 import FirebaseFirestore
+import Combine
+import Firebase
 
 class SetupBudgetViewModel: ObservableObject {
     @Published var budgetAmount: String = "50"
@@ -15,13 +17,15 @@ class SetupBudgetViewModel: ObservableObject {
     @Published var showActiveBudgetAlert: Bool = false
     
     var locationManager = LocationManager()
-    var budgetModel: BudgetModel
-    var userId: String
+    private var budgetModel: BudgetModel
+    private var userId: String
     private let db = Firestore.firestore()
+    private let setupBudgetRepository: SetupBudgetRepositoryProtocol
 
-    init(budgetModel: BudgetModel, userId: String) {
+    init(budgetModel: BudgetModel, userId: String, setupBudgetRepository: SetupBudgetRepositoryProtocol = SetupBudgetRepository()) {
         self.budgetModel = budgetModel
         self.userId = userId
+        self.setupBudgetRepository = setupBudgetRepository
     }
 
     func adjustBudget(by amount: Int) {
@@ -45,52 +49,37 @@ class SetupBudgetViewModel: ObservableObject {
     }
 
     func lockInBudget() {
-        checkForActiveBudget { hasActiveBudget in
-            if hasActiveBudget {
-                self.showActiveBudgetAlert = true
-            } else if let amount = Double(self.budgetAmount) {
-                self.budgetModel.budgetAmount = amount
-                UserDefaults.standard.set(amount, forKey: "userBudget")
-                self.saveBudgetToFirestore(amount: amount)
-                self.startBudgetLiveActivity(amount: amount)
-                self.showConfirmationAlert = true
-            }
-        }
-    }
-
-    private func checkForActiveBudget(completion: @escaping (Bool) -> Void) {
-        db.collection("budgets")
-            .whereField("userId", isEqualTo: userId)
-            .whereField("status", isEqualTo: "active")
-            .getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Error checking active budget: \(error.localizedDescription)")
-                    completion(false)
-                } else {
-                    completion(querySnapshot?.documents.isEmpty == false)
-                }
-            }
-    }
-
-    func saveBudgetToFirestore(amount: Double) {
-        let budget = Budget(
-            id: UUID(),
-            userId: userId,
-            totalAmount: amount,
-            spentAmount: 0.0,
-            name: "New Budget",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-            isRecurring: false,
-            status: "active",
-            transactions: []
-        )
-        
-        db.collection("budgets").document(budget.id.uuidString).setData(budget.toDictionary()) { error in
+        setupBudgetRepository.checkForActiveBudget(userId: userId) { [weak self] hasActiveBudget, error in
             if let error = error {
-                print("Error saving budget: \(error.localizedDescription)")
-            } else {
-                print("Budget successfully saved!")
+                print("Error checking active budget: \(error.localizedDescription)")
+                return
+            }
+            if hasActiveBudget {
+                self?.showActiveBudgetAlert = true
+            } else if let amount = Double(self?.budgetAmount ?? "") {
+                self?.budgetModel.budgetAmount = amount
+                UserDefaults.standard.set(amount, forKey: "userBudget")
+                let budget = Budget(
+                    id: UUID(),
+                    userId: self?.userId ?? "",
+                    totalAmount: amount,
+                    spentAmount: 0.0,
+                    name: "New Budget",
+                    startDate: Date(),
+                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                    isRecurring: false,
+                    status: "active",
+                    transactions: []
+                )
+                self?.setupBudgetRepository.saveBudgetToFirestore(budget: budget) { error in
+                    if let error = error {
+                        print("Error saving budget: \(error.localizedDescription)")
+                    } else {
+                        print("Budget successfully saved!")
+                        self?.startBudgetLiveActivity(amount: amount)
+                        self?.showConfirmationAlert = true
+                    }
+                }
             }
         }
     }
@@ -116,48 +105,44 @@ class SetupBudgetViewModel: ObservableObject {
     }
 
     func cancelActiveBudget() {
-        db.collection("budgets")
-            .whereField("userId", isEqualTo: userId)
-            .whereField("status", isEqualTo: "active")
-            .getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Error fetching active budget: \(error.localizedDescription)")
-                } else if let documents = querySnapshot?.documents, !documents.isEmpty {
-                    for document in documents {
-                        let budgetData = document.data()
-                        let pastBudget = PastBudget(
-                            barName: budgetData["name"] as? String ?? "Unknown",
-                            date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
-                            amountSpent: budgetData["spentAmount"] as? Double ?? 0.0,
-                            budget: budgetData["totalAmount"] as? Double ?? 0.0,
-                            transactions: [] // Assuming transactions are not stored in the budget document
-                        )
-                        
-                        // Update the budget status to "cancelled"
-                        document.reference.updateData(["status": "cancelled"]) { error in
-                            if let error = error {
-                                print("Error cancelling budget: \(error.localizedDescription)")
-                            } else {
-                                print("Budget successfully cancelled!")
-                                self.addPastBudgetToUser(pastBudget: pastBudget)
-                            }
-                        }
+        setupBudgetRepository.cancelActiveBudget(userId: userId) { [weak self] error in
+            if let error = error {
+                print("Error cancelling budget: \(error.localizedDescription)")
+            } else {
+                print("Budget successfully cancelled!")
+                // Assuming you have logic to create a PastBudget instance
+                let pastBudget = PastBudget(
+                    barName: "Unknown",
+                    date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
+                    budget: Budget(id: UUID(), userId: self?.userId ?? "", totalAmount: 0.0, spentAmount: 0.0, name: "Unknown", startDate: Date(), endDate: Date(), isRecurring: false, status: "cancelled", transactions: []),
+                    transactions: []
+                )
+                self?.setupBudgetRepository.addPastBudgetToUser(userId: self?.userId ?? "", pastBudget: pastBudget) { error in
+                    if let error = error {
+                        print("Error adding past budget: \(error.localizedDescription)")
+                    } else {
+                        print("Past budget successfully added!")
                     }
-                } else {
-                    print("No active budget found to cancel.")
                 }
             }
+        }
     }
 
-    private func addPastBudgetToUser(pastBudget: PastBudget) {
-        let userRef = db.collection("users").document(userId)
-        userRef.updateData([
-            "pastBudgets": FieldValue.arrayUnion([pastBudget.toDictionary()])
-        ]) { error in
+    func fetchUserBudgets(authService: AuthService) {
+        guard let userId = authService.user?.id else {
+            print("User ID not available")
+            return
+        }
+
+        let db = Firestore.firestore()
+        db.collection("budgets").whereField("userId", isEqualTo: userId).getDocuments { (querySnapshot, error) in
             if let error = error {
-                print("Error adding past budget: \(error.localizedDescription)")
+                print("Error fetching budgets: \(error.localizedDescription)")
             } else {
-                print("Past budget successfully added!")
+                for document in querySnapshot!.documents {
+                    print("\(document.documentID) => \(document.data())")
+                    // Handle the fetched budgets as needed
+                }
             }
         }
     }

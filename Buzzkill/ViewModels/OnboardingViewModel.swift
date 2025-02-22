@@ -8,15 +8,8 @@ class OnboardingViewModel: ObservableObject {
     @Published var showConnectCardPrompt = false
     @Published var isCardConnected = false
 
-    let questions = [
-        "How much money did you lose to 'just one more round' last month?",
-        "Be honest: Have you ever checked your bank account the morning after and thought… 'who TF stole my money?'",
-        "Your last big night out cost as much as...",
-        "How often do you end up buying drinks for 'friends' you just met?",
-        "Your liver has a savings account. What's your balance?",
-        "If your bar tab had an investment portfolio, how rich would you be?"
-    ]
-
+    private let onboardingRepository: OnboardingRepositoryProtocol
+    let questions: [String]
     let answers = [
         ["$0 - I am a responsible adult (Lies.)", "$20 - $50 (I mean, that's just a couple of Ubers home…)", "$50 - $100 (That's like...a full year of Netflix.)", "More than $100 (You could've bought stocks, but no. You bought tequila.)"],
         ["No, I always budget my fun (Sure, buddy.)", "Once or twice, but I like living on the edge.", "Every weekend. My bank statements give me anxiety.", "I don't even check. If I don't see it, it didn't happen."],
@@ -26,7 +19,9 @@ class OnboardingViewModel: ObservableObject {
         ["A decent savings account. I make smart choices.", "A struggling startup. Some wins, mostly losses.", "I could've been a crypto millionaire. Instead, I bought Fireball shots.", "I own negative assets. Even my past self regrets me."]
     ]
 
-    init() {
+    init(onboardingRepository: OnboardingRepositoryProtocol = OnboardingRepository.shared) {
+        self.onboardingRepository = onboardingRepository
+        self.questions = onboardingRepository.fetchOnboardingData()
         selectedAnswers = Array(repeating: nil, count: questions.count)
     }
 

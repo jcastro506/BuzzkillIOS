@@ -71,6 +71,8 @@ struct HomeView: View {
 
 // MARK: - Home Header View
 struct HomeHeaderView: View {
+    @EnvironmentObject var authService: AuthService
+
     var body: some View {
         HStack {
             Text("Buzzkill")
@@ -88,7 +90,7 @@ struct HomeHeaderView: View {
                         .foregroundColor(.white)
                 }
 
-                NavigationLink(destination: ProfileView()) {
+                NavigationLink(destination: ProfileView(authService: authService)) {
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .frame(width: 24, height: 24)
@@ -202,8 +204,21 @@ struct PastBudgetsView: View {
         PastBudget(
             barName: "Neon Lights Bar",
             date: "Feb 3, 2025",
-            amountSpent: 80,
-            budget: 100,
+            budget: Budget(
+                id: UUID(),
+                userId: "sampleUserId",
+                totalAmount: 100.00,
+                spentAmount: 80.00,
+                name: "Neon Lights Bar",
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "completed",
+                transactions: [
+                    Transaction(id: UUID(), amount: 20, date: Date(), description: "Drinks", name: "Neon Lights Bar"),
+                    Transaction(id: UUID(), amount: 60, date: Date(), description: "Food", name: "Neon Lights Bar")
+                ]
+            ),
             transactions: [
                 Transaction(id: UUID(), amount: 20, date: Date(), description: "Drinks", name: "Neon Lights Bar"),
                 Transaction(id: UUID(), amount: 60, date: Date(), description: "Food", name: "Neon Lights Bar")
@@ -212,8 +227,21 @@ struct PastBudgetsView: View {
         PastBudget(
             barName: "The Golden Tap",
             date: "Jan 27, 2025",
-            amountSpent: 120,
-            budget: 100,
+            budget: Budget(
+                id: UUID(),
+                userId: "sampleUserId",
+                totalAmount: 100.00,
+                spentAmount: 120.00,
+                name: "The Golden Tap",
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "completed",
+                transactions: [
+                    Transaction(id: UUID(), amount: 50, date: Date(), description: "Drinks", name: "The Golden Tap"),
+                    Transaction(id: UUID(), amount: 70, date: Date(), description: "Food", name: "The Golden Tap")
+                ]
+            ),
             transactions: [
                 Transaction(id: UUID(), amount: 50, date: Date(), description: "Drinks", name: "The Golden Tap"),
                 Transaction(id: UUID(), amount: 70, date: Date(), description: "Food", name: "The Golden Tap")
@@ -222,8 +250,21 @@ struct PastBudgetsView: View {
         PastBudget(
             barName: "Midnight Lounge",
             date: "Jan 20, 2025",
-            amountSpent: 90,
-            budget: 100,
+            budget: Budget(
+                id: UUID(),
+                userId: "sampleUserId",
+                totalAmount: 100.00,
+                spentAmount: 90.00,
+                name: "Midnight Lounge",
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "completed",
+                transactions: [
+                    Transaction(id: UUID(), amount: 30, date: Date(), description: "Drinks", name: "Midnight Lounge"),
+                    Transaction(id: UUID(), amount: 60, date: Date(), description: "Food", name: "Midnight Lounge")
+                ]
+            ),
             transactions: [
                 Transaction(id: UUID(), amount: 30, date: Date(), description: "Drinks", name: "Midnight Lounge"),
                 Transaction(id: UUID(), amount: 60, date: Date(), description: "Food", name: "Midnight Lounge")
@@ -232,8 +273,21 @@ struct PastBudgetsView: View {
         PastBudget(
             barName: "Electric Avenue",
             date: "Jan 15, 2025",
-            amountSpent: 70,
-            budget: 100,
+            budget: Budget(
+                id: UUID(),
+                userId: "sampleUserId",
+                totalAmount: 100.00,
+                spentAmount: 70.00,
+                name: "Electric Avenue",
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "completed",
+                transactions: [
+                    Transaction(id: UUID(), amount: 40, date: Date(), description: "Drinks", name: "Electric Avenue"),
+                    Transaction(id: UUID(), amount: 30, date: Date(), description: "Food", name: "Electric Avenue")
+                ]
+            ),
             transactions: [
                 Transaction(id: UUID(), amount: 40, date: Date(), description: "Drinks", name: "Electric Avenue"),
                 Transaction(id: UUID(), amount: 30, date: Date(), description: "Food", name: "Electric Avenue")
@@ -479,13 +533,13 @@ struct BudgetCard: View {
                 .padding(.vertical, 4)
             
             HStack {
-                Text("Spent: $\(String(format: "%.2f", budget.amountSpent))")
+                Text("Spent: $\(String(format: "%.2f", budget.budget.spentAmount))")
                     .font(.footnote)
                     .foregroundColor(.white)
                 
                 Spacer()
                 
-                Text("Budget: $\(String(format: "%.2f", budget.budget))")
+                Text("Budget: $\(String(format: "%.2f", budget.budget.totalAmount))")
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.7))
             }
@@ -509,8 +563,8 @@ struct BudgetCard: View {
     }
     
     private var progressValue: Double {
-        guard budget.budget > 0 else { return 0 }
-        return min(max(budget.amountSpent / budget.budget, 0), 1)
+        guard budget.budget.totalAmount > 0 else { return 0 }
+        return min(max(budget.budget.spentAmount / budget.budget.totalAmount, 0), 1)
     }
 }
 

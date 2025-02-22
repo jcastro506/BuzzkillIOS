@@ -10,6 +10,7 @@ class HomeViewViewModel: ObservableObject {
     @Published var showBudgetDetailModal = false
     
     var budgetModel: BudgetModel
+    private let homeRepository = HomeRepository.shared
 
     init(budgetModel: BudgetModel) {
         self.budgetModel = budgetModel
@@ -31,31 +32,22 @@ class HomeViewViewModel: ObservableObject {
         transactions.append(dummyTransaction)
         updateSpentAmount()
         
-        // Update the Live Activity
-        addTransaction(amount: 10.0, currentAmountSpent: spent, totalBudget: budgetModel.budgetAmount)
+        // Use HomeRepository to add transaction
+        homeRepository.addTransaction(amount: 10.0, currentAmountSpent: spent, totalBudget: budgetModel.budgetAmount) { newAmountSpent in
+            self.updateLiveActivity(with: newAmountSpent, totalBudget: self.budgetModel.budgetAmount)
+        }
     }
     
     func updateSpentAmount() {
         spent = transactions.reduce(0) { $0 + $1.amount }
     }
     
-    private func addTransaction(amount: Double, currentAmountSpent: Double, totalBudget: Double) {
-        let newAmountSpent = currentAmountSpent + amount
-        updateLiveActivity(with: newAmountSpent, totalBudget: totalBudget)
-    }
-    
     private func updateLiveActivity(with newAmountSpent: Double, totalBudget: Double) {
-        let amountRemaining = totalBudget - newAmountSpent
-        
-        let updatedContentState = BudgetDetailsWidgetAttributes.ContentState(
-            totalBudget: totalBudget,
-            amountSpent: newAmountSpent,
-            amountRemaining: amountRemaining
-        )
-        
-        if let activity = Activity<BudgetDetailsWidgetAttributes>.activities.first {
-            Task {
-                await activity.update(using: updatedContentState)
+        homeRepository.updateLiveActivity(with: newAmountSpent, totalBudget: totalBudget) { updatedContentState in
+            if let activity = Activity<BudgetDetailsWidgetAttributes>.activities.first {
+                Task {
+                    await activity.update(using: updatedContentState)
+                }
             }
         }
     }

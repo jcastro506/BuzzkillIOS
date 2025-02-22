@@ -4,14 +4,14 @@ class LoginViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
     @Published var errorMessage: String?
     
-    private var authService: AuthServiceProtocol
+    private var authRepository: AuthRepositoryProtocol
     
-    init(authService: AuthServiceProtocol) {
-        self.authService = authService
+    init(authRepository: AuthRepositoryProtocol = AuthRepository.shared) {
+        self.authRepository = authRepository
     }
     
     func login(email: String, password: String) {
-        authService.signIn(email: email, password: password) { [weak self] result in
+        authRepository.signIn(email: email, password: password) { [weak self] result in
             switch result {
             case .success:
                 self?.isAuthenticated = true

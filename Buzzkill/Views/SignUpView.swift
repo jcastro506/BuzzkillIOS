@@ -5,10 +5,10 @@ struct SignUpView: View {
     @Binding var isUserSignedIn: Bool
     @Binding var isNewUser: Bool
     
-    init(isUserSignedIn: Binding<Bool>, isNewUser: Binding<Bool>, authService: AuthServiceProtocol) {
+    init(isUserSignedIn: Binding<Bool>, isNewUser: Binding<Bool>, signupRepository: SignupRepositoryProtocol) {
         self._isUserSignedIn = isUserSignedIn
         self._isNewUser = isNewUser
-        self._viewModel = StateObject(wrappedValue: SignupViewModel(authService: authService))
+        self._viewModel = StateObject(wrappedValue: SignupViewModel(signupRepository: signupRepository))
     }
     
     var body: some View {
@@ -75,6 +75,12 @@ struct SignUpView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
+                .onChange(of: isUserSignedIn) { newValue in
+                    if newValue {
+                        // Navigate to the next view or dismiss the current view
+                        // This could be a navigation link or a presentation logic
+                    }
+                }
                 
                 // Show error message if any
                 if let errorMessage = viewModel.errorMessage {
@@ -167,6 +173,6 @@ struct SignUpView_Previews: PreviewProvider {
     @State static var isNewUser = true
     
     static var previews: some View {
-        SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isNewUser, authService: AuthService())
+        SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isNewUser, signupRepository: SignupRepository())
     }
 }

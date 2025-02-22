@@ -1,12 +1,14 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @State private var userName: String = "Dakota Castro"
-    @State private var email: String = "dakota@example.com"
+    @StateObject private var viewModel: ProfileViewModel
     @State private var profileImage: Image? = Image(systemName: "person.circle.fill")
     @State private var totalSpent: Double = 520.75
     @State private var avgSpentPerNight: Double = 43.39
-    @EnvironmentObject var authService: AuthService
+    
+    init(authService: AuthService) {
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(authService: authService))
+    }
     
     var body: some View {
         ZStack {
@@ -27,11 +29,11 @@ struct ProfileView: View {
                         
                         // User Info
                         VStack(spacing: 4) {
-                            Text(userName)
+                            Text(viewModel.userName)
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
-                            Text(email)
+                            Text(viewModel.email)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -50,7 +52,7 @@ struct ProfileView: View {
                                 Text("Total Spent")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
-                                Text("$\(String(format: "%.2f", totalSpent))")
+                                Text("$\(String(format: "%.2f", viewModel.totalSpent))")
                                     .font(.headline)
                                     .foregroundColor(.white)
                             }
@@ -134,14 +136,7 @@ struct ProfileView: View {
                     
                     // Logout Button
                     Button(action: {
-                        do {
-                            try authService.signOut()
-                            // Handle successful sign-out, e.g., navigate to login screen
-                            print("User signed out successfully")
-                        } catch {
-                            // Handle sign-out error, e.g., show an alert
-                            print("Sign out failed: \(error.localizedDescription)")
-                        }
+                        viewModel.signOut()
                     }) {
                         Text("Log Out")
                             .font(.headline)
@@ -180,8 +175,7 @@ struct ProfileView: View {
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView()
+        ProfileView(authService: AuthService())
             .preferredColorScheme(.dark)
-            .environmentObject(AuthService())
     }
 }

@@ -122,11 +122,11 @@ extension BudgetDetailsWidgetAttributes.ContentState {
     }
 }
 
-#Preview("Notification", as: .content, using: BudgetDetailsWidgetAttributes.preview) {
-   BudgetDetailsWidgetLiveActivity()
-} contentStates: {
-    BudgetDetailsWidgetAttributes.ContentState.sampleData
-}
+//#Preview("Notification", as: .content, using: BudgetDetailsWidgetAttributes.preview) {
+//   BudgetDetailsWidgetLiveActivity()
+//} contentStates: {
+//    BudgetDetailsWidgetAttributes.ContentState.sampleData
+//}
 
 func updateLiveActivity(with newAmountSpent: Double, totalBudget: Double) {
     let amountRemaining = totalBudget - newAmountSpent

@@ -10,11 +10,12 @@ class SignupViewModel: ObservableObject {
     @Published var isRegistered: Bool = false
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
+    @Published var isNewUser: Bool = false
     
-    private var authService: AuthServiceProtocol
+    private var signupRepository: SignupRepositoryProtocol
     
-    init(authService: AuthServiceProtocol) {
-        self.authService = authService
+    init(signupRepository: SignupRepositoryProtocol) {
+        self.signupRepository = signupRepository
     }
     
     func signUp() {
@@ -23,12 +24,13 @@ class SignupViewModel: ObservableObject {
         }
         
         isLoading = true
-        authService.register(email: email, password: password, username: username) { [weak self] result in
+        signupRepository.register(email: email, password: password, username: username) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
                 case .success:
                     self?.isRegistered = true
+                    self?.isNewUser = true
                     self?.errorMessage = nil
                     print("Registration successful for name: \(self?.username ?? ""), email: \(self?.email ?? "")")
                 case .failure(let error):

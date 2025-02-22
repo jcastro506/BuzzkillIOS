@@ -17,8 +17,8 @@ struct BudgetDetailView: View {
             Divider()
             
             VStack(spacing: 10) {
-                BudgetDetailRow(title: "Spent:", amount: budget.amountSpent, color: .red)
-                BudgetDetailRow(title: "Budget:", amount: budget.budget, color: .green)
+                BudgetDetailRow(title: "Spent:", amount: budget.budget.spentAmount, color: .red)
+                BudgetDetailRow(title: "Budget:", amount: budget.budget.totalAmount, color: .green)
             }
             
             Divider()
@@ -105,16 +105,28 @@ struct PastBudgetTransactionRow: View {
 
 struct BudgetDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        BudgetDetailView(budget: PastBudget(
-            barName: "Neon Lights Bar",
-            date: "Feb 3, 2025",
-            amountSpent: 80.00,
-            budget: 100.00,
+        let budget = Budget(
+            id: UUID(),
+            userId: "sampleUserId",
+            totalAmount: 100.00,
+            spentAmount: 80.00,
+            name: "Neon Lights Bar",
+            startDate: Date(),
+            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+            isRecurring: false,
+            status: "completed",
             transactions: [
                 Transaction(id: UUID(), amount: 20.00, date: Date(), description: "Drinks", name: "Cocktail"),
                 Transaction(id: UUID(), amount: 15.00, date: Date(), description: "Snacks", name: "Nachos"),
                 Transaction(id: UUID(), amount: 30.00, date: Date(), description: "Entry Fee", name: "Cover Charge")
             ]
+        )
+        
+        BudgetDetailView(budget: PastBudget(
+            barName: "Neon Lights Bar",
+            date: "Feb 3, 2025",
+            budget: budget,
+            transactions: budget.transactions
         ))
         .preferredColorScheme(.dark)
     }
