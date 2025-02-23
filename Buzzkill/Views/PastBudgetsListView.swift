@@ -46,6 +46,18 @@ struct PastBudgetsListView: View {
                         if viewModel.isLoading {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
+                        } else if !viewModel.allDataLoaded {
+                            // Use GeometryReader to detect when the last item appears
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onAppear {
+                                        if geometry.frame(in: .global).maxY < UIScreen.main.bounds.height {
+                                            // Fetch the next page when the last item appears
+                                            viewModel.fetchNextPage(userId: authService.user?.id ?? "")
+                                        }
+                                    }
+                            }
+                            .frame(height: 1) // Minimal height to trigger onAppear
                         }
                     }
                     .padding(.horizontal, 16) // Ensure proper padding around grid
@@ -59,8 +71,8 @@ struct PastBudgetsListView: View {
             }
         }
         .onAppear {
-            // Always fetch all user past budgets on appear to ensure up-to-date information
-            viewModel.fetchAllUserPastBudgets(userId: authService.user?.id ?? "")
+            // Fetch the latest ten user past budgets on appear
+            viewModel.fetchAllUserPastBudgets(userId: authService.user?.id ?? "", limit: 10)
         }
     }
 }
