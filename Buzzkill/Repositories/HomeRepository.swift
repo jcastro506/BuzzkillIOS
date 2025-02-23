@@ -89,4 +89,28 @@ class HomeRepository {
                 }
             }
     }
+    
+    // New method to fetch past budgets for a user
+    func fetchPastBudgets(userId: String, completion: @escaping ([PastBudget]?, Error?) -> Void) {
+        let pastBudgetsRef = FirestoreManager.shared.db.collection("past_budgets").whereField("userId", isEqualTo: userId)
+        
+        pastBudgetsRef.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error fetching past budgets: \(error.localizedDescription)")
+                completion(nil, error)
+                return
+            }
+            
+            if let documents = querySnapshot?.documents {
+                let pastBudgets = documents.compactMap { document -> PastBudget? in
+                    let data = document.data()
+                    return PastBudget.fromDictionary(data)
+                }
+                completion(pastBudgets, nil)
+            } else {
+                print("No past budgets found for userId: \(userId)")
+                completion([], nil)
+            }
+        }
+    }
 } 

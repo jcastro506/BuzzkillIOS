@@ -10,6 +10,7 @@ class HomeViewViewModel: ObservableObject {
     @Published var selectedPastBudget: PastBudget?
     @Published var showBudgetDetailModal = false
     @Published var hasActiveBudget: Bool = true
+    @Published var pastBudgets: [PastBudget] = []
     
     var budgetModel: BudgetModel
     private let homeRepository = HomeRepository.shared
@@ -24,6 +25,7 @@ class HomeViewViewModel: ObservableObject {
         // Ensure the budget is fetched after the user is set
         authService.onUserSet { [weak self] in
             self?.fetchAndUpdateCurrentBudget()
+            self?.fetchPastBudgets() // Fetch past budgets after user is set
         }
         
         // Listen for budget updates
@@ -100,6 +102,29 @@ class HomeViewViewModel: ObservableObject {
             }
             DispatchQueue.main.async {
                 self?.hasActiveBudget = hasActiveBudget
+            }
+        }
+    }
+
+    func fetchPastBudgets() {
+        guard let userId = authService.user?.id else {
+            print("User ID not available")
+            return
+        }
+        
+        homeRepository.fetchPastBudgets(userId: userId) { [weak self] pastBudgets, error in
+            if let error = error {
+                print("Error fetching past budgets: \(error.localizedDescription)")
+                return
+            }
+            
+            if let pastBudgets = pastBudgets {
+                DispatchQueue.main.async {
+                    self?.pastBudgets = pastBudgets
+                    print("Fetched past budgets: \(pastBudgets)")
+                }
+            } else {
+                print("No past budgets found")
             }
         }
     }

@@ -36,8 +36,10 @@ struct HomeView: View {
                         )
                         
                         PastBudgetsView(
+                            pastBudgets: viewModel.pastBudgets,
                             selectedPastBudget: $viewModel.selectedPastBudget,
-                            showBudgetDetailModal: $viewModel.showBudgetDetailModal
+                            showBudgetDetailModal: $viewModel.showBudgetDetailModal,
+                            authService: authService
                         )
                         
                         CurrentTransactionsView(
@@ -62,6 +64,7 @@ struct HomeView: View {
             .background(Color.black)
             .onAppear {
                 viewModel.fetchAndUpdateCurrentBudget()
+                viewModel.fetchPastBudgets()
             }
             .sheet(isPresented: $viewModel.showEditSheet) {
                 if let transaction = viewModel.selectedTransaction {
@@ -204,88 +207,38 @@ extension Color {
 
 // MARK: - Past Budgets View
 struct PastBudgetsView: View {
-    let pastBudgets: [PastBudget] = [
-        PastBudget(
-            id: UUID(),
-            userId: "sampleUserId",
-            totalAmount: 100.00,
-            spentAmount: 80.00,
-            name: "Neon Lights Bar",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-            isRecurring: false,
-            status: "completed",
-            transactions: [
-                Transaction(id: UUID(), amount: 20, date: Date(), description: "Drinks", name: "Neon Lights Bar"),
-                Transaction(id: UUID(), amount: 60, date: Date(), description: "Food", name: "Neon Lights Bar")
-            ]
-        ),
-        PastBudget(
-            id: UUID(),
-            userId: "sampleUserId",
-            totalAmount: 100.00,
-            spentAmount: 120.00,
-            name: "The Golden Tap",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-            isRecurring: false,
-            status: "completed",
-            transactions: [
-                Transaction(id: UUID(), amount: 50, date: Date(), description: "Drinks", name: "The Golden Tap"),
-                Transaction(id: UUID(), amount: 70, date: Date(), description: "Food", name: "The Golden Tap")
-            ]
-        ),
-        PastBudget(
-            id: UUID(),
-            userId: "sampleUserId",
-            totalAmount: 100.00,
-            spentAmount: 90.00,
-            name: "Midnight Lounge",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-            isRecurring: false,
-            status: "completed",
-            transactions: [
-                Transaction(id: UUID(), amount: 30, date: Date(), description: "Drinks", name: "Midnight Lounge"),
-                Transaction(id: UUID(), amount: 60, date: Date(), description: "Food", name: "Midnight Lounge")
-            ]
-        ),
-        PastBudget(
-            id: UUID(),
-            userId: "sampleUserId",
-            totalAmount: 100.00,
-            spentAmount: 70.00,
-            name: "Electric Avenue",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-            isRecurring: false,
-            status: "completed",
-            transactions: [
-                Transaction(id: UUID(), amount: 40, date: Date(), description: "Drinks", name: "Electric Avenue"),
-                Transaction(id: UUID(), amount: 30, date: Date(), description: "Food", name: "Electric Avenue")
-            ]
-        )
-    ]
+    let pastBudgets: [PastBudget]
     @Binding var selectedPastBudget: PastBudget?
     @Binding var showBudgetDetailModal: Bool
+    let authService: AuthService
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Past Budgets")
+            Text("Recent Budgets")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
                 .padding(.horizontal, 0)
 
             TabView {
-                ForEach(pastBudgets.indices, id: \.self) { index in
-                    BudgetCard(budget: pastBudgets[index])
+                // Sort past budgets by startDate in descending order and take the first three
+                ForEach(pastBudgets.sorted(by: { $0.startDate > $1.startDate }).prefix(3), id: \.id) { budget in
+                    BudgetCard(budget: budget)
                         .frame(width: 300, height: 180)
                         .padding(.horizontal, 8) // Adjust padding for closer spacing
                         .onTapGesture {
-                            selectedPastBudget = pastBudgets[index]
+                            selectedPastBudget = budget
                             showBudgetDetailModal = true
                         }
+                }
+                
+                // "See All" Button as the last item in the TabView
+                NavigationLink(destination: PastBudgetsListView().environmentObject(authService)) {
+                    Text("See All")
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                        .frame(width: 300, height: 180)
+                        .padding(.horizontal, 8)
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
@@ -562,8 +515,12 @@ struct HomeView_Previews: PreviewProvider {
         let sampleBudgetModel = BudgetModel()
         sampleBudgetModel.budgetAmount = 200.0 // Set a sample budget amount
 
+        // Create a sample AuthService with mock data
+        let sampleAuthService = AuthService()
+
         return HomeView()
             .environmentObject(sampleBudgetModel) // Provide the sample model to the environment
+            .environmentObject(sampleAuthService) // Provide the sample AuthService to the environment
             .preferredColorScheme(.dark)
     }
 }
