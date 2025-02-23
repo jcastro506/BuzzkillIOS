@@ -224,31 +224,42 @@ struct PastBudgetsView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 0)
 
-            TabView {
-                ForEach(pastBudgets.sorted(by: { $0.startDate > $1.startDate }).prefix(3), id: \.id) { budget in
-                    BudgetCard(budget: budget)
-                        .frame(width: 300, height: 180)
-                        .padding(.horizontal, 8)
-                        .onTapGesture {
-                            selectedPastBudget = budget
-                            showBudgetDetailModal = true
-                        }
-                }
+            if pastBudgets.isEmpty {
+                Text("As you use the app, we'll show your most recent three budgets here. Enjoy this blank slate while it lasts")
+                    .font(.body)
+                    .foregroundColor(.white)
+                    .italic()
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: .infinity)
+            } else {
+                TabView {
+                    ForEach(pastBudgets.sorted(by: { $0.startDate > $1.startDate }).prefix(3), id: \.id) { budget in
+                        BudgetCard(budget: budget)
+                            .frame(width: 300, height: 180)
+                            .padding(.horizontal, 8)
+                            .onTapGesture {
+                                selectedPastBudget = budget
+                                showBudgetDetailModal = true
+                            }
+                    }
 
-                // Update "See All" button to switch tabs
-                Button(action: {
-                    selectedTab = 3 // Assuming the "Past Budgets" tab is at index 3
-                }) {
-                    Text("See All")
-                        .font(.headline)
-                        .foregroundColor(.blue)
-                        .frame(width: 300, height: 180)
-                        .padding(.horizontal, 8)
+                    // Update "See All" button to switch tabs
+                    Button(action: {
+                        selectedTab = 3 // Assuming the "Past Budgets" tab is at index 3
+                    }) {
+                        Text("See All")
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                            .frame(width: 300, height: 180)
+                            .padding(.horizontal, 8)
+                    }
                 }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+                .frame(height: 220)
+                .padding(.bottom, 20)
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-            .frame(height: 220)
-            .padding(.bottom, 20)
         }
     }
 }
@@ -263,7 +274,7 @@ struct CurrentTransactionsView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Recent Transactions")
+            Text("Current Transactions")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)

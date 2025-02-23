@@ -29,39 +29,53 @@ struct PastBudgetsListView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 16)
 
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(viewModel.pastBudgets) { budget in
-                            PastBudgetCard(budget: budget)
-                                .onTapGesture {
-                                    withAnimation {
-                                        selectedBudget = budget
-                                        showBudgetDetail = true
-                                    }
-                                }
-                                .background(Color.gray.opacity(0.2))
-                                .cornerRadius(8)
-                                .padding(8)
-                        }
-
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .frame(maxWidth: .infinity)
-                        } else if !viewModel.allDataLoaded {
-                            // Use GeometryReader to detect when the last item appears
-                            GeometryReader { geometry in
-                                Color.clear
-                                    .onAppear {
-                                        if geometry.frame(in: .global).maxY < UIScreen.main.bounds.height {
-                                            // Fetch the next page when the last item appears
-                                            viewModel.fetchNextPage(userId: authService.user?.id ?? "")
-                                        }
-                                    }
+                    ZStack {
+                        if viewModel.pastBudgets.isEmpty {
+                            VStack {
+                                Spacer()
+                                Text("You don't have any past regrets... yet.")
+                                    .italic()
+                                    .font(.title3)
+                                    .foregroundColor(.white)
+                                    .multilineTextAlignment(.center)
+                                Spacer()
                             }
-                            .frame(height: 1) // Minimal height to trigger onAppear
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                ForEach(viewModel.pastBudgets) { budget in
+                                    PastBudgetCard(budget: budget)
+                                        .onTapGesture {
+                                            withAnimation {
+                                                selectedBudget = budget
+                                                showBudgetDetail = true
+                                            }
+                                        }
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(8)
+                                        .padding(8)
+                                }
+
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .frame(maxWidth: .infinity)
+                                } else if !viewModel.allDataLoaded {
+                                    GeometryReader { geometry in
+                                        Color.clear
+                                            .onAppear {
+                                                if geometry.frame(in: .global).maxY < UIScreen.main.bounds.height {
+                                                    viewModel.fetchNextPage(userId: authService.user?.id ?? "")
+                                                }
+                                            }
+                                    }
+                                    .frame(height: 1)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.top, 8)
                         }
                     }
-                    .padding(.horizontal, 16) // Ensure proper padding around grid
-                    .padding(.top, 8)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .sheet(isPresented: $showBudgetDetail) {
                     if let budget = selectedBudget {
