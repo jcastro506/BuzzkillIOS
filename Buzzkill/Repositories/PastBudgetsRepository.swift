@@ -18,25 +18,31 @@ class PastBudgetsRepository: PastBudgetsRepositoryProtocol {
             "The Whiskey Way"
         ]
         
-        return (0..<size).map { index in
-            PastBudget(
-                barName: barNames[(page * size + index) % barNames.count],
-                date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
-                budget: Budget(
-                    id: UUID(),
-                    userId: "sampleUserId",
-                    totalAmount: Double.random(in: 500...1000),
-                    spentAmount: Double.random(in: 50...500),
-                    name: barNames[(page * size + index) % barNames.count],
-                    startDate: Date(),
-                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-                    isRecurring: false,
-                    status: "completed",
-                    transactions: generateDummyTransactions()
-                ),
-                transactions: generateDummyTransactions()
+        var budgets: [PastBudget] = []
+        
+        for index in 0..<size {
+            let barName = barNames[(page * size + index) % barNames.count]
+            let totalAmount = Double.random(in: 500...1000)
+            let spentAmount = Double.random(in: 50...500)
+            let transactions = generateDummyTransactions()
+            
+            let budget = PastBudget(
+                id: UUID(),
+                userId: "sampleUserId",
+                totalAmount: totalAmount,
+                spentAmount: spentAmount,
+                name: barName,
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "completed",
+                transactions: transactions
             )
+            
+            budgets.append(budget)
         }
+        
+        return budgets
     }
 
     private func generateDummyTransactions() -> [Transaction] {

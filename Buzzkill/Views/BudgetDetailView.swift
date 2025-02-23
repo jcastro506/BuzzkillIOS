@@ -5,20 +5,29 @@ struct BudgetDetailView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(budget.barName)
+            Text(budget.name)
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
             
-            Text(budget.date)
-                .font(.title3)
+            Text("Start Date: \(budget.startDate, style: .date)")
+                .font(.subheadline)
                 .foregroundColor(.secondary)
             
-            Divider()
+            Text("End Date: \(budget.endDate, style: .date)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
             
-            VStack(spacing: 10) {
-                BudgetDetailRow(title: "Spent:", amount: budget.budget.spentAmount, color: .red)
-                BudgetDetailRow(title: "Budget:", amount: budget.budget.totalAmount, color: .green)
+            HStack {
+                Text("Total Budget: $\(budget.totalAmount, specifier: "%.2f")")
+                    .font(.headline)
+                    .foregroundColor(.green)
+                
+                Spacer()
+                
+                Text("Spent: $\(budget.spentAmount, specifier: "%.2f")")
+                    .font(.headline)
+                    .foregroundColor(.red)
             }
             
             Divider()
@@ -123,9 +132,15 @@ struct BudgetDetailView_Previews: PreviewProvider {
         )
         
         BudgetDetailView(budget: PastBudget(
-            barName: "Neon Lights Bar",
-            date: "Feb 3, 2025",
-            budget: budget,
+            id: UUID(),
+            userId: "sampleUserId",
+            totalAmount: budget.totalAmount,
+            spentAmount: budget.spentAmount,
+            name: budget.name,
+            startDate: budget.startDate,
+            endDate: budget.endDate,
+            isRecurring: budget.isRecurring,
+            status: budget.status,
             transactions: budget.transactions
         ))
         .preferredColorScheme(.dark)

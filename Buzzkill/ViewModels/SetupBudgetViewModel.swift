@@ -99,9 +99,15 @@ class SetupBudgetViewModel: ObservableObject {
         
         // Create a PastBudget from the current budget
         let pastBudget = PastBudget(
-            barName: "Unknown", // Update with actual data if available
-            date: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none),
-            budget: currentBudget,
+            id: UUID(),
+            userId: user.id,
+            totalAmount: currentBudget.totalAmount,
+            spentAmount: currentBudget.spentAmount,
+            name: currentBudget.name,
+            startDate: currentBudget.startDate,
+            endDate: currentBudget.endDate,
+            isRecurring: currentBudget.isRecurring,
+            status: "completed",
             transactions: currentBudget.transactions
         )
         

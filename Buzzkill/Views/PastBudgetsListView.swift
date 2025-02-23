@@ -111,19 +111,19 @@ struct PastBudgetCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(budget.barName)
+            Text(budget.name)
                 .font(.headline)
                 .foregroundColor(.primary)
             
-            Text(budget.date)
+            Text(budget.startDate, style: .date)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             
             HStack {
-                Text("Spent: \(budget.budget.spentAmount, specifier: "%.2f")")
+                Text("Spent: \(budget.spentAmount, specifier: "%.2f")")
                     .foregroundColor(.red)
                 Spacer()
-                Text("Budget: \(budget.budget.totalAmount, specifier: "%.2f")")
+                Text("Budget: \(budget.totalAmount, specifier: "%.2f")")
                     .foregroundColor(.green)
             }
             .font(.footnote)
@@ -142,25 +142,21 @@ struct PastBudgetCard: View {
 struct PastBudgetsListView_Previews: PreviewProvider {
     static var previews: some View {
         let sampleBudgetModel = BudgetModel()
-        sampleBudgetModel.pastBudgets = [
-            PastBudget(
-                barName: "Neon Lights Bar",
-                date: "Feb 3, 2025",
-                budget: Budget(
-                    id: UUID(),
-                    userId: "sampleUserId",
-                    totalAmount: 100.00,
-                    spentAmount: 80.00,
-                    name: "Neon Lights Bar",
-                    startDate: Date(),
-                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-                    isRecurring: false,
-                    status: "completed",
-                    transactions: []
-                ),
-                transactions: []
-            )
-        ]
+        let pastBudget = PastBudget(
+            id: UUID(),
+            userId: "sampleUserId",
+            totalAmount: 100.00,
+            spentAmount: 80.00,
+            name: "Sample Budget Name",
+            startDate: Date(),
+            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+            isRecurring: false,
+            status: "completed",
+            transactions: [
+                Transaction(id: UUID(), amount: 20, date: Date(), description: "Sample Transaction", name: "Sample Name")
+            ]
+        )
+        sampleBudgetModel.pastBudgets = [pastBudget]
         
         return PastBudgetsListView()
             .environmentObject(AuthService())

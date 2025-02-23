@@ -62,6 +62,20 @@ class ProfileRepository: ProfileRepositoryProtocol {
     private func mapDocumentToPastBudget(data: [String: Any]) throws -> PastBudget {
         // Implement mapping logic for PastBudget
         // This is a placeholder implementation
-        return PastBudget(barName: "Example Bar", date: "Example Date", budget: Budget(id: UUID(), userId: "userId", totalAmount: 0, spentAmount: 0, name: "Example", startDate: Date(), endDate: Date(), isRecurring: false, status: "completed", transactions: []), transactions: [])
+        let pastBudget = PastBudget(
+            id: UUID(),
+            userId: "sampleUserId",
+            totalAmount: 100.00,
+            spentAmount: 80.00,
+            name: "Sample Budget Name",
+            startDate: Date(),
+            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+            isRecurring: false,
+            status: "completed",
+            transactions: [
+                Transaction(id: UUID(), amount: 20, date: Date(), description: "Sample Transaction", name: "Sample Name")
+            ]
+        )
+        return pastBudget
     }
 } 
