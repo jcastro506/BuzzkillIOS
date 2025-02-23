@@ -1,5 +1,6 @@
 import SwiftUI
 import ActivityKit
+import Combine
 
 class HomeViewViewModel: ObservableObject {
     @Published var spent: Double = 0.0
@@ -12,6 +13,7 @@ class HomeViewViewModel: ObservableObject {
     var budgetModel: BudgetModel
     private let homeRepository = HomeRepository.shared
     private let authService: AuthService
+    private var cancellables = Set<AnyCancellable>()
 
     init(budgetModel: BudgetModel, authService: AuthService) {
         self.budgetModel = budgetModel
@@ -22,6 +24,14 @@ class HomeViewViewModel: ObservableObject {
         authService.onUserSet { [weak self] in
             self?.fetchAndUpdateCurrentBudget()
         }
+        
+        // Listen for budget updates
+        let setupBudgetViewModel = SetupBudgetViewModel(budgetModel: budgetModel, userId: authService.user?.id ?? "")
+        setupBudgetViewModel.budgetUpdated
+            .sink { [weak self] in
+                self?.fetchAndUpdateCurrentBudget()
+            }
+            .store(in: &cancellables)
     }
 
     func addDummyTransaction() {

@@ -135,6 +135,9 @@ struct SetBudgetView: View {
 
                 Button(action: {
                     setupBudgetViewModel.lockInBudget(authService: authService)
+                    // Notify HomeViewViewModel or update shared model
+                    // For example, if using a shared model:
+                    // budgetModel.budgetAmount = Double(setupBudgetViewModel.budgetAmount) ?? 0
                 }) {
                     Text("Lock it In")
                         .font(.headline)
@@ -149,6 +152,9 @@ struct SetBudgetView: View {
 
                 Button(action: {
                     setupBudgetViewModel.cancelActiveBudget(authService: authService)
+                    // Add logic to update the budget status to "inactive"
+                    // For example, if using a repository:
+                    // setupBudgetViewModel.updateBudgetStatusToInactive(userId: authService.user?.id)
                 }) {
                     Text("Cancel Transaction")
                         .font(.headline)

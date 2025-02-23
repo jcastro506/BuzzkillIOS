@@ -58,9 +58,7 @@ struct HomeView: View {
             }
             .background(Color.black)
             .onAppear {
-                if viewModel.budgetModel.budgetAmount == 0 {
-                    viewModel.fetchAndUpdateCurrentBudget() // Fetch budget on appear
-                }
+                viewModel.fetchAndUpdateCurrentBudget()
             }
             .sheet(isPresented: $viewModel.showEditSheet) {
                 if let transaction = viewModel.selectedTransaction {

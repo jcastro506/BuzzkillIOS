@@ -43,4 +43,25 @@ class SetupBudgetRepository: SetupBudgetRepositoryProtocol {
             "pastBudgets": FieldValue.arrayUnion([pastBudget.toDictionary()])
         ], completion: completion)
     }
+
+    func updateBudgetStatus(userId: String, status: String) {
+        let db = Firestore.firestore()
+        let budgetsRef = db.collection("budgets").whereField("userId", isEqualTo: userId).whereField("status", isEqualTo: "active")
+        
+        budgetsRef.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error fetching active budgets: \(error)")
+            } else {
+                for document in querySnapshot!.documents {
+                    document.reference.updateData(["status": status]) { error in
+                        if let error = error {
+                            print("Error updating budget status: \(error)")
+                        } else {
+                            print("Budget status successfully updated to \(status)")
+                        }
+                    }
+                }
+            }
+        }
+    }
 } 
