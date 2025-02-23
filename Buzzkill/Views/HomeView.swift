@@ -116,7 +116,7 @@ struct BudgetProgressView: View {
     let spent: Double
     
     var progress: Double {
-        return spent / budget
+        return max(0, 1 - (spent / budget)) // Calculate progress as remaining budget
     }
     
     var body: some View {
@@ -133,9 +133,9 @@ struct BudgetProgressView: View {
                     .frame(width: 150, height: 150)
                     .animation(.easeOut(duration: 0.8), value: progress)
                 
-                if progress > 1.0 {
+                if progress < 0.0 {
                     Circle()
-                        .trim(from: 0.0, to: progress - 1.0)
+                        .trim(from: 0.0, to: abs(progress))
                         .stroke(Color.red, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .frame(width: 150, height: 150)
@@ -150,7 +150,7 @@ struct BudgetProgressView: View {
                         .foregroundColor(.white)
                         .animation(.easeInOut(duration: 0.3))
                     
-                    Text("\(String(format: "%.0f", progress * 100))% Spent")
+                    Text("\(String(format: "%.0f", (1 - progress) * 100))% Spent")
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
@@ -161,12 +161,12 @@ struct BudgetProgressView: View {
     }
     
     private var progressColor: Color {
-        if progress <= 0.4 {
+        if progress >= 0.6 {
             return Color.green
-        } else if progress <= 0.7 {
+        } else if progress >= 0.3 {
             return Color.orange
         } else {
-            return Color(red: 0.8, green: 0, blue: 0) // Darker red before overspending
+            return Color(red: 0.8, green: 0, blue: 0) // Darker red as budget depletes
         }
     }
 }
