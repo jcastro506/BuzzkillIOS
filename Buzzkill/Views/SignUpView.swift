@@ -1,14 +1,17 @@
 import SwiftUI
+import Combine
 
 struct SignUpView: View {
-    @StateObject private var viewModel: SignupViewModel
+    @StateObject private var viewModel: SignUpViewModel
     @Binding var isUserSignedIn: Bool
     @Binding var isNewUser: Bool
     
-    init(isUserSignedIn: Binding<Bool>, isNewUser: Binding<Bool>, signupRepository: SignupRepositoryProtocol) {
+    init(isUserSignedIn: Binding<Bool>, isNewUser: Binding<Bool>) {
         self._isUserSignedIn = isUserSignedIn
         self._isNewUser = isNewUser
-        self._viewModel = StateObject(wrappedValue: SignupViewModel(signupRepository: signupRepository))
+        let firestoreManager = FirestoreManager.shared
+        let signupRepository = SignupRepository(firestoreManager: firestoreManager)
+        _viewModel = StateObject(wrappedValue: SignUpViewModel(signupRepository: signupRepository))
     }
     
     var body: some View {
@@ -173,6 +176,6 @@ struct SignUpView_Previews: PreviewProvider {
     @State static var isNewUser = true
     
     static var previews: some View {
-        SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isNewUser, signupRepository: SignupRepository())
+        SignUpView(isUserSignedIn: $isUserSignedIn, isNewUser: $isNewUser)
     }
 }

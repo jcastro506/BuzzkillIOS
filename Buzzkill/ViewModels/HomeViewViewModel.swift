@@ -11,13 +11,16 @@ class HomeViewViewModel: ObservableObject {
     
     var budgetModel: BudgetModel
     private let homeRepository = HomeRepository.shared
+    private let authService: AuthService
 
-    init(budgetModel: BudgetModel) {
+    init(budgetModel: BudgetModel, authService: AuthService) {
         self.budgetModel = budgetModel
+        self.authService = authService
         updateSpentAmount()
-        let newBudgetAmount = UserDefaults.standard.double(forKey: "userBudget")
-        if budgetModel.budgetAmount != newBudgetAmount {
-            budgetModel.budgetAmount = newBudgetAmount
+        
+        // Ensure the budget is fetched after the user is set
+        authService.onUserSet { [weak self] in
+            self?.fetchAndUpdateCurrentBudget()
         }
     }
 
@@ -48,6 +51,32 @@ class HomeViewViewModel: ObservableObject {
                 Task {
                     await activity.update(using: updatedContentState)
                 }
+            }
+        }
+    }
+
+    func fetchAndUpdateCurrentBudget() {
+        guard let userId = authService.user?.id else {
+            print("User ID not available")
+            return
+        }
+        
+        print("Fetching current budget for user ID: \(userId)")
+        
+        homeRepository.fetchCurrentBudget(userId: userId) { [weak self] currentBudget, error in
+            if let error = error {
+                print("Failed to fetch current budget: \(error.localizedDescription)")
+                return
+            }
+            
+            if let currentBudget = currentBudget {
+                DispatchQueue.main.async {
+                    self?.budgetModel.budgetAmount = currentBudget
+                    self?.updateSpentAmount() // Ensure spent amount is recalculated
+                    print("Current budget updated: \(currentBudget)")
+                }
+            } else {
+                print("Current budget is nil, check Firestore data mapping")
             }
         }
     }

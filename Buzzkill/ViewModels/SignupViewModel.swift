@@ -1,7 +1,8 @@
 import Foundation
 import Firebase
+import Combine
 
-class SignupViewModel: ObservableObject {
+class SignUpViewModel: ObservableObject {
     @Published var username: String = ""
     @Published var email: String = ""
     @Published var password: String = ""

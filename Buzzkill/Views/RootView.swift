@@ -21,7 +21,7 @@ struct RootView: View {
                 // User is signed in
                 MainTabView(selectedTab: $selectedTab, authService: authService)
             } else {
-                SignUpView(isUserSignedIn: .constant(false), isNewUser: .constant(true), signupRepository: SignupRepository())
+                SignUpView(isUserSignedIn: .constant(false), isNewUser: .constant(true))
                     .onAppear {
                         print("Displaying SignUpView for new user")
                     }

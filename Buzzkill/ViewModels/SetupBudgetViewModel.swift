@@ -20,12 +20,12 @@ class SetupBudgetViewModel: ObservableObject {
     private var budgetModel: BudgetModel
     private var userId: String
     private let db = Firestore.firestore()
-    private let setupBudgetRepository: SetupBudgetRepositoryProtocol
+    private let setupBudgetRepository: SetupBudgetRepository
 
-    init(budgetModel: BudgetModel, userId: String, setupBudgetRepository: SetupBudgetRepositoryProtocol = SetupBudgetRepository()) {
+    init(budgetModel: BudgetModel, userId: String, firestoreManager: FirestoreManager = FirestoreManager.shared) {
         self.budgetModel = budgetModel
         self.userId = userId
-        self.setupBudgetRepository = setupBudgetRepository
+        self.setupBudgetRepository = SetupBudgetRepository(firestoreManager: firestoreManager)
     }
 
     func adjustBudget(by amount: Int) {

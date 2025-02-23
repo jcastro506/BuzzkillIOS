@@ -9,10 +9,12 @@ class ProfileViewModel: ObservableObject {
     private var authService: AuthService
     private var profileRepository: ProfileRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
-    
-    init(authService: AuthService, profileRepository: ProfileRepositoryProtocol = ProfileRepository()) {
+    private let setupBudgetRepository: SetupBudgetRepository
+
+    init(authService: AuthService, firestoreManager: FirestoreManager = FirestoreManager.shared) {
         self.authService = authService
-        self.profileRepository = profileRepository
+        self.profileRepository = ProfileRepository(firestoreManager: firestoreManager)
+        self.setupBudgetRepository = SetupBudgetRepository(firestoreManager: firestoreManager)
         bindUserData()
     }
     

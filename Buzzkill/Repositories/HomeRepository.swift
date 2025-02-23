@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseFirestore
 
 class HomeRepository {
     // Singleton instance
@@ -44,5 +45,31 @@ class HomeRepository {
         )
         
         completion(updatedContentState)
+    }
+    
+    // Updated method to fetch current budget from Firestore
+    func fetchCurrentBudget(userId: String, completion: @escaping (Double?, Error?) -> Void) {
+        let budgetsRef = FirestoreManager.shared.db.collection("budgets").whereField("userId", isEqualTo: userId).whereField("status", isEqualTo: "active")
+        
+        budgetsRef.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error fetching current budget: \(error.localizedDescription)")
+                completion(nil, error)
+                return
+            }
+            
+            if let documents = querySnapshot?.documents, !documents.isEmpty {
+                if let currentBudget = documents.first?.data()["totalAmount"] as? Double {
+                    print("Current Budget: \(currentBudget)")
+                    completion(currentBudget, nil)
+                } else {
+                    print("Current budget not found in documents")
+                    completion(nil, nil)
+                }
+            } else {
+                print("No active budget found for userId: \(userId)")
+                completion(nil, nil)
+            }
+        }
     }
 } 

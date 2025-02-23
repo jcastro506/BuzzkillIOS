@@ -2,9 +2,14 @@ import SwiftUI
 import ActivityKit
 
 struct HomeView: View {
-    @EnvironmentObject var budgetModel: BudgetModel // Access the shared data model
     @EnvironmentObject var authService: AuthService // Access the authentication service
-    @StateObject private var viewModel = HomeViewViewModel(budgetModel: BudgetModel()) // Temporary initialization
+    @StateObject private var viewModel: HomeViewViewModel
+
+    init() {
+        let authService = AuthService() // Create an instance of AuthService
+        let budgetModel = BudgetModel() // Assuming you have a way to initialize this
+        _viewModel = StateObject(wrappedValue: HomeViewViewModel(budgetModel: budgetModel, authService: authService))
+    }
 
     var body: some View {
         NavigationStack {
@@ -13,30 +18,20 @@ struct HomeView: View {
                 
                 ScrollView {
                     LazyVStack(spacing: 16) {
-                        // Add a header to display the active budget
+                        // Active Budget Header
                         HStack {
-                            if let currentBudget = authService.user?.currentBudget {
-                                Text("Active Budget: $\(String(format: "%.2f", currentBudget.totalAmount))")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 0)
-                            } else {
-                                Text("No Active Budget")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 0)
-                            }
+                            Text("Active Budget: $\(String(format: "%.2f", viewModel.budgetModel.budgetAmount))")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 0)
                             Spacer()
                         }
                         .padding(.top, 10)
                         
-                        if let currentBudget = authService.user?.currentBudget {
-                            BudgetProgressView(budget: currentBudget.totalAmount, spent: currentBudget.spentAmount)
-                        } else {
-                            BudgetProgressView(budget: 0, spent: 0)
-                        }
+                        // Circular Progress View
+                        BudgetProgressView(budget: viewModel.budgetModel.budgetAmount, spent: viewModel.spent)
+                        
                         PastBudgetsView(
                             selectedPastBudget: $viewModel.selectedPastBudget,
                             showBudgetDetailModal: $viewModel.showBudgetDetailModal
@@ -64,8 +59,7 @@ struct HomeView: View {
             .background(Color.black)
             .onAppear {
                 if viewModel.budgetModel.budgetAmount == 0 {
-                    viewModel.budgetModel = budgetModel
-                    viewModel.updateSpentAmount()
+                    viewModel.fetchAndUpdateCurrentBudget() // Fetch budget on appear
                 }
             }
             .sheet(isPresented: $viewModel.showEditSheet) {

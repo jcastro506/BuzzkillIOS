@@ -1,6 +1,5 @@
 import Foundation
 import Combine
-import FirebaseFirestore
 
 protocol ProfileRepositoryProtocol {
     func fetchUserProfile(userId: String) async throws -> User
@@ -9,27 +8,21 @@ protocol ProfileRepositoryProtocol {
 }
 
 class ProfileRepository: ProfileRepositoryProtocol {
-    private let db = Firestore.firestore()
+    private let firestoreManager: FirestoreManager
+    
+    init(firestoreManager: FirestoreManager) {
+        self.firestoreManager = firestoreManager
+    }
     
     func fetchUserProfile(userId: String) async throws -> User {
-        let userRef = db.collection("users").document(userId)
+        let data = try await firestoreManager.fetchDocument(collection: "users", documentId: userId)
         
-        return try await withCheckedThrowingContinuation { continuation in
-            userRef.getDocument { document, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let document = document, document.exists, let data = document.data() {
-                    print("Raw document data: \(data)")
-                    do {
-                        let user = try self.mapDocumentToUser(data: data)
-                        continuation.resume(returning: user)
-                    } catch {
-                        continuation.resume(throwing: error)
-                    }
-                } else {
-                    continuation.resume(throwing: NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found"]))
-                }
-            }
+        print("Raw document data: \(data)")
+        do {
+            let user = try self.mapDocumentToUser(data: data)
+            return user
+        } catch {
+            throw error
         }
     }
     

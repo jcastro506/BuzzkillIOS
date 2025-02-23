@@ -11,6 +11,7 @@ protocol AuthServiceProtocol {
 class AuthService: AuthServiceProtocol, ObservableObject {
     @Published var user: User?
     private let db = Firestore.firestore()
+    private var userSetCompletion: (() -> Void)?
 
     init() {
         Auth.auth().addStateDidChangeListener { [weak self] auth, firebaseUser in
@@ -30,14 +31,22 @@ class AuthService: AuthServiceProtocol, ObservableObject {
                             pastBudgets: [] // Assuming you will fetch or handle past budgets separately
                         )
                         self?.user = user
+                        print("User successfully fetched and set: \(user)")
+                        self?.userSetCompletion?()
                     } else {
                         self?.user = nil
+                        print("User document does not exist or failed to fetch")
                     }
                 }
             } else {
                 self?.user = nil
+                print("No Firebase user found, setting user to nil")
             }
         }
+    }
+
+    func onUserSet(completion: @escaping () -> Void) {
+        self.userSetCompletion = completion
     }
 
     func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {

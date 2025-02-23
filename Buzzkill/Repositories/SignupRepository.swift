@@ -1,9 +1,14 @@
 import Foundation
 import Firebase
 import FirebaseAuth
-import FirebaseFirestore
 
 class SignupRepository: SignupRepositoryProtocol {
+    private let firestoreManager: FirestoreManager
+
+    init(firestoreManager: FirestoreManager) {
+        self.firestoreManager = firestoreManager
+    }
+
     func register(email: String, password: String, username: String, completion: @escaping (Result<Void, Error>) -> Void) {
         // Assuming Firebase Auth is used for registration
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
@@ -31,9 +36,6 @@ class SignupRepository: SignupRepositoryProtocol {
             return
         }
         
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(userId)
-        
         // Create a User instance with default values
         let user = User(
             id: userId,
@@ -47,8 +49,8 @@ class SignupRepository: SignupRepositoryProtocol {
             currentBudget: nil // Initialize with nil or a default Budget
         )
         
-        // Use the toDictionary method to set data
-        userRef.setData(user.toDictionary()) { error in
+        // Use FirestoreManager to set data
+        firestoreManager.saveDocument(collection: "users", documentId: userId, data: user.toDictionary()) { error in
             if let error = error {
                 completion(.failure(error))
             } else {
