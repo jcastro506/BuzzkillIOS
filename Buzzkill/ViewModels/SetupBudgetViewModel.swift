@@ -110,8 +110,24 @@ class SetupBudgetViewModel: ObservableObject {
     }
 
     func cancelActiveBudget(authService: AuthService) {
-        if let userId = authService.user?.id {
-            setupBudgetRepository.updateBudgetStatus(userId: userId, status: "inactive")
+        guard let userId = authService.user?.id else { return }
+        
+        setupBudgetRepository.updateBudgetStatus(userId: userId, status: "inactive") { [weak self] (error: Error?) in
+            if let error = error {
+                print("Error updating budget status: \(error.localizedDescription)")
+                return
+            }
+            
+            // Delete the currentBudget from the user in Firestore
+            self?.setupBudgetRepository.deleteCurrentBudgetFromUser(userId: userId) { (error: Error?) in
+                if let error = error {
+                    print("Error deleting current budget from user: \(error.localizedDescription)")
+                } else {
+                    print("Current budget successfully deleted from user.")
+                    // Optionally, update the local user object
+                    authService.user?.currentBudget = nil
+                }
+            }
         }
     }
 

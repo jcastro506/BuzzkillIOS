@@ -20,7 +20,7 @@ struct HomeView: View {
                     LazyVStack(spacing: 16) {
                         // Active Budget Header
                         HStack {
-                            Text("Active Budget: $\(String(format: "%.2f", viewModel.budgetModel.budgetAmount))")
+                            Text(viewModel.hasActiveBudget ? "Active Budget: $\(String(format: "%.2f", viewModel.budgetModel.budgetAmount))" : "No Budget Set")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
@@ -29,8 +29,11 @@ struct HomeView: View {
                         }
                         .padding(.top, 10)
                         
-                        // Circular Progress View
-                        BudgetProgressView(budget: viewModel.budgetModel.budgetAmount, spent: viewModel.spent)
+                        // Always show the Circular Progress View, set progress to 0 if no active budget
+                        BudgetProgressView(
+                            budget: viewModel.hasActiveBudget ? viewModel.budgetModel.budgetAmount : 1.0, 
+                            spent: viewModel.hasActiveBudget ? viewModel.spent : 0.0
+                        )
                         
                         PastBudgetsView(
                             selectedPastBudget: $viewModel.selectedPastBudget,
@@ -116,6 +119,7 @@ struct BudgetProgressView: View {
     let spent: Double
     
     var progress: Double {
+        guard budget > 1.0 else { return 0.0 } // Ensure progress is 0 if no active budget
         return max(0, 1 - (spent / budget)) // Calculate progress as remaining budget
     }
     
@@ -126,33 +130,28 @@ struct BudgetProgressView: View {
                     .stroke(Color.gray.opacity(0.3), lineWidth: 10)
                     .frame(width: 150, height: 150)
                 
-                Circle()
-                    .trim(from: 0.0, to: min(progress, 1.0))
-                    .stroke(progressColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .frame(width: 150, height: 150)
-                    .animation(.easeOut(duration: 0.8), value: progress)
-                
-                if progress < 0.0 {
+                if budget > 1.0 {
                     Circle()
-                        .trim(from: 0.0, to: abs(progress))
-                        .stroke(Color.red, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                        .trim(from: 0.0, to: min(progress, 1.0))
+                        .stroke(progressColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .frame(width: 150, height: 150)
                         .animation(.easeOut(duration: 0.8), value: progress)
                 }
                 
                 VStack {
-                    Text("$\(String(format: "%.2f", max(0, budget - spent))) Left")
+                    Text(budget > 1.0 ? "$\(String(format: "%.2f", max(0, budget - spent))) Left" : "No Budget")
                         .font(.system(size: 20, weight: .bold))
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                         .foregroundColor(.white)
                         .animation(.easeInOut(duration: 0.3))
                     
-                    Text("\(String(format: "%.0f", (1 - progress) * 100))% Spent")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
+                    if budget > 1.0 {
+                        Text("\(String(format: "%.0f", (1 - progress) * 100))% Spent")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    }
                 }
                 .frame(width: 130) // Ensure text stays within the circle
             }

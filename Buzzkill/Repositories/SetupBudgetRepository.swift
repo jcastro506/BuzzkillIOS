@@ -44,24 +44,34 @@ class SetupBudgetRepository: SetupBudgetRepositoryProtocol {
         ], completion: completion)
     }
 
-    func updateBudgetStatus(userId: String, status: String) {
+    func updateBudgetStatus(userId: String, status: String, completion: @escaping (Error?) -> Void) {
         let db = Firestore.firestore()
         let budgetsRef = db.collection("budgets").whereField("userId", isEqualTo: userId).whereField("status", isEqualTo: "active")
         
         budgetsRef.getDocuments { (querySnapshot, error) in
             if let error = error {
-                print("Error fetching active budgets: \(error)")
+                completion(error)
             } else {
                 for document in querySnapshot!.documents {
                     document.reference.updateData(["status": status]) { error in
                         if let error = error {
-                            print("Error updating budget status: \(error)")
+                            completion(error)
                         } else {
-                            print("Budget status successfully updated to \(status)")
+                            completion(nil)
                         }
                     }
                 }
             }
+        }
+    }
+
+    func deleteCurrentBudgetFromUser(userId: String, completion: @escaping (Error?) -> Void) {
+        let userRef = firestoreManager.db.collection("users").document(userId)
+        
+        userRef.updateData([
+            "current_budget": FieldValue.delete()
+        ]) { error in
+            completion(error)
         }
     }
 } 

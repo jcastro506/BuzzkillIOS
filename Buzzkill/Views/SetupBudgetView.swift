@@ -152,9 +152,6 @@ struct SetBudgetView: View {
 
                 Button(action: {
                     setupBudgetViewModel.cancelActiveBudget(authService: authService)
-                    // Add logic to update the budget status to "inactive"
-                    // For example, if using a repository:
-                    // setupBudgetViewModel.updateBudgetStatusToInactive(userId: authService.user?.id)
                 }) {
                     Text("Cancel Transaction")
                         .font(.headline)

@@ -9,6 +9,7 @@ class HomeViewViewModel: ObservableObject {
     @Published var showEditSheet = false
     @Published var selectedPastBudget: PastBudget?
     @Published var showBudgetDetailModal = false
+    @Published var hasActiveBudget: Bool = true
     
     var budgetModel: BudgetModel
     private let homeRepository = HomeRepository.shared
@@ -87,6 +88,18 @@ class HomeViewViewModel: ObservableObject {
                 }
             } else {
                 print("Current budget is nil, check Firestore data mapping")
+            }
+        }
+        
+        // Fetch the current budget and update the hasActiveBudget property
+        // This is a placeholder for the actual implementation
+        homeRepository.checkForActiveBudget(userId: userId) { [weak self] hasActiveBudget, error in
+            if let error = error {
+                print("Error checking for active budget: \(error.localizedDescription)")
+                return
+            }
+            DispatchQueue.main.async {
+                self?.hasActiveBudget = hasActiveBudget
             }
         }
     }

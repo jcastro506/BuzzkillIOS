@@ -5,6 +5,8 @@ class HomeRepository {
     // Singleton instance
     static let shared = HomeRepository()
     
+    private let db = Firestore.firestore()
+    
     private init() {
         // Private initializer to ensure only one instance is created
     }
@@ -71,5 +73,20 @@ class HomeRepository {
                 completion(nil, nil)
             }
         }
+    }
+    
+    // Add this method to check for an active budget
+    func checkForActiveBudget(userId: String, completion: @escaping (Bool, Error?) -> Void) {
+        db.collection("budgets")
+            .whereField("userId", isEqualTo: userId)
+            .whereField("status", isEqualTo: "active")
+            .getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    completion(false, error)
+                } else {
+                    let hasActiveBudget = querySnapshot?.documents.isEmpty == false
+                    completion(hasActiveBudget, nil)
+                }
+            }
     }
 } 
