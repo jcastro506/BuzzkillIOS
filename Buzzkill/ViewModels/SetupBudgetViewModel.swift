@@ -118,6 +118,12 @@ class SetupBudgetViewModel: ObservableObject {
                 return
             }
             
+            // Retrieve the current budget before deleting it
+            guard let currentBudget = authService.user?.currentBudget else {
+                print("No current budget found for user.")
+                return
+            }
+            
             // Delete the currentBudget from the user in Firestore
             self?.setupBudgetRepository.deleteCurrentBudgetFromUser(userId: userId) { (error: Error?) in
                 if let error = error {
@@ -126,6 +132,15 @@ class SetupBudgetViewModel: ObservableObject {
                     print("Current budget successfully deleted from user.")
                     // Optionally, update the local user object
                     authService.user?.currentBudget = nil
+                }
+            }
+
+            // Add the current budget to past budgets
+            self?.setupBudgetRepository.addCurrentBudgetToPastBudgets(userId: userId, currentBudget: currentBudget) { error in
+                if let error = error {
+                    print("Error adding current budget to past budgets: \(error.localizedDescription)")
+                } else {
+                    print("Current budget successfully added to past budgets.")
                 }
             }
         }

@@ -40,7 +40,7 @@ class SetupBudgetRepository: SetupBudgetRepositoryProtocol {
 
     func addPastBudgetToUser(userId: String, pastBudget: PastBudget, completion: @escaping (Error?) -> Void) {
         firestoreManager.updateDocument(collection: "users", documentId: userId, data: [
-            "pastBudgets": FieldValue.arrayUnion([pastBudget.toDictionary()])
+            "past_budgets": FieldValue.arrayUnion([pastBudget.toDictionary()])
         ], completion: completion)
     }
 
@@ -74,4 +74,15 @@ class SetupBudgetRepository: SetupBudgetRepositoryProtocol {
             completion(error)
         }
     }
+
+    func addCurrentBudgetToPastBudgets(userId: String, currentBudget: Budget, completion: @escaping (Error?) -> Void) {
+        let userRef = firestoreManager.db.collection("users").document(userId)
+        
+        userRef.updateData([
+            "past_budgets": FieldValue.arrayUnion([currentBudget.toDictionary()])
+        ]) { error in
+            completion(error)
+        }
+    }
+    
 } 
