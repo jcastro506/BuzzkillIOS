@@ -6,7 +6,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
+            HomeView(selectedTab: $selectedTab)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")

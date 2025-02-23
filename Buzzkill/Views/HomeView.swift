@@ -4,11 +4,13 @@ import ActivityKit
 struct HomeView: View {
     @EnvironmentObject var authService: AuthService // Access the authentication service
     @StateObject private var viewModel: HomeViewViewModel
+    @Binding var selectedTab: Int // Add this binding
 
-    init() {
+    init(selectedTab: Binding<Int>) { // Update initializer
         let authService = AuthService() // Create an instance of AuthService
         let budgetModel = BudgetModel() // Assuming you have a way to initialize this
         _viewModel = StateObject(wrappedValue: HomeViewViewModel(budgetModel: budgetModel, authService: authService))
+        _selectedTab = selectedTab // Initialize the binding
     }
 
     var body: some View {
@@ -39,7 +41,8 @@ struct HomeView: View {
                             pastBudgets: viewModel.pastBudgets,
                             selectedPastBudget: $viewModel.selectedPastBudget,
                             showBudgetDetailModal: $viewModel.showBudgetDetailModal,
-                            authService: authService
+                            authService: authService,
+                            selectedTab: $selectedTab
                         )
                         
                         CurrentTransactionsView(
@@ -211,6 +214,7 @@ struct PastBudgetsView: View {
     @Binding var selectedPastBudget: PastBudget?
     @Binding var showBudgetDetailModal: Bool
     let authService: AuthService
+    @Binding var selectedTab: Int // Add this binding
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -221,19 +225,20 @@ struct PastBudgetsView: View {
                 .padding(.horizontal, 0)
 
             TabView {
-                // Sort past budgets by startDate in descending order and take the first three
                 ForEach(pastBudgets.sorted(by: { $0.startDate > $1.startDate }).prefix(3), id: \.id) { budget in
                     BudgetCard(budget: budget)
                         .frame(width: 300, height: 180)
-                        .padding(.horizontal, 8) // Adjust padding for closer spacing
+                        .padding(.horizontal, 8)
                         .onTapGesture {
                             selectedPastBudget = budget
                             showBudgetDetailModal = true
                         }
                 }
-                
-                // "See All" Button as the last item in the TabView
-                NavigationLink(destination: PastBudgetsListView().environmentObject(authService)) {
+
+                // Update "See All" button to switch tabs
+                Button(action: {
+                    selectedTab = 3 // Assuming the "Past Budgets" tab is at index 3
+                }) {
                     Text("See All")
                         .font(.headline)
                         .foregroundColor(.blue)
@@ -242,8 +247,8 @@ struct PastBudgetsView: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-            .frame(height: 220) // Increase height to move dots further down
-            .padding(.bottom, 20) // Add padding to move dots further down
+            .frame(height: 220)
+            .padding(.bottom, 20)
         }
     }
 }
@@ -518,7 +523,7 @@ struct HomeView_Previews: PreviewProvider {
         // Create a sample AuthService with mock data
         let sampleAuthService = AuthService()
 
-        return HomeView()
+        return HomeView(selectedTab: .constant(0))
             .environmentObject(sampleBudgetModel) // Provide the sample model to the environment
             .environmentObject(sampleAuthService) // Provide the sample AuthService to the environment
             .preferredColorScheme(.dark)
