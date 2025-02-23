@@ -143,6 +143,14 @@ class SetupBudgetViewModel: ObservableObject {
                     print("Current budget successfully added to past budgets.")
                 }
             }
+
+            self?.setupBudgetRepository.moveCurrentBudgetToPastBudgetsCollection(userId: userId, currentBudget: currentBudget) { error in
+                if let error = error {
+                    print("Error moving current budget to past budgets: \(error.localizedDescription)")
+                } else {
+                    print("Current budget successfully moved to past budgets.")
+                }
+            }
         }
     }
 

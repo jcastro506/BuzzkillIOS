@@ -84,5 +84,31 @@ class SetupBudgetRepository: SetupBudgetRepositoryProtocol {
             completion(error)
         }
     }
-    
+
+    func moveCurrentBudgetToPastBudgetsCollection(userId: String, currentBudget: Budget, completion: @escaping (Error?) -> Void) {
+        // Convert current budget to PastBudget
+        let pastBudget = PastBudget(
+            id: currentBudget.id,
+            userId: currentBudget.userId,
+            totalAmount: currentBudget.totalAmount,
+            spentAmount: currentBudget.spentAmount,
+            name: currentBudget.name,
+            startDate: currentBudget.startDate,
+            endDate: currentBudget.endDate,
+            isRecurring: currentBudget.isRecurring,
+            status: currentBudget.status,
+            transactions: currentBudget.transactions
+        )
+        
+        // Use FirestoreManager to save to past_budgets collection
+        firestoreManager.saveDocument(collection: "past_budgets", documentId: pastBudget.id.uuidString, data: pastBudget.toDictionary()) { error in
+            if let error = error {
+                print("Error saving to past_budgets collection: \(error.localizedDescription)")
+                completion(error)
+            } else {
+                print("Successfully added current budget to past_budgets collection.")
+                completion(nil)
+            }
+        }
+    }
 } 
