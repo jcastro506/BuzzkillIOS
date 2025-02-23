@@ -35,7 +35,8 @@ class PastBudgetsViewModel: ObservableObject {
                 }
                 
                 if let pastBudgets = pastBudgets {
-                    self?.pastBudgets = pastBudgets
+                    // Sort the past budgets by startDate in descending order
+                    self?.pastBudgets = pastBudgets.sorted(by: { $0.startDate > $1.startDate })
                     print("Fetched all user past budgets: \(pastBudgets)")
                 } else {
                     print("No past budgets found for user")

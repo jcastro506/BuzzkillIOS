@@ -56,16 +56,11 @@ struct PastBudgetsListView: View {
                         BudgetDetailView(budget: budget)
                     }
                 }
-
-                NavigationLink(destination: ProfileView(authService: authService)) {
-                    Text("Go to Profile")
-                }
             }
         }
         .onAppear {
-            if viewModel.pastBudgets.isEmpty {
-                viewModel.fetchAllUserPastBudgets(userId: authService.user?.id ?? "")
-            }
+            // Always fetch all user past budgets on appear to ensure up-to-date information
+            viewModel.fetchAllUserPastBudgets(userId: authService.user?.id ?? "")
         }
     }
 }
