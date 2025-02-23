@@ -55,20 +55,25 @@ class ProfileRepository: ProfileRepositoryProtocol {
     private func mapDocumentToPastBudget(data: [String: Any]) throws -> PastBudget {
         // Implement mapping logic for PastBudget
         // This is a placeholder implementation
-        let pastBudget = PastBudget(
-            id: UUID(),
-            userId: "sampleUserId",
-            totalAmount: 100.00,
-            spentAmount: 80.00,
-            name: "Sample Budget Name",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-            isRecurring: false,
-            status: "completed",
-            transactions: [
-                Transaction(id: UUID(), amount: 20, date: Date(), description: "Sample Transaction", name: "Sample Name")
-            ]
-        )
-        return pastBudget
+        if let idString = data["id"] as? String, let uuid = UUID(uuidString: idString) {
+            let pastBudget = PastBudget(
+                id: uuid,
+                userId: "sampleUserId",
+                totalAmount: 100.00,
+                spentAmount: 80.00,
+                name: "Sample Budget Name",
+                startDate: Date(),
+                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
+                isRecurring: false,
+                status: "completed",
+                transactions: [
+                    Transaction(id: UUID(), amount: 20, date: Date(), description: "Sample Transaction", name: "Sample Name")
+                ]
+            )
+            return pastBudget
+        } else {
+            print("Invalid UUID string")
+            throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid UUID format"])
+        }
     }
 } 

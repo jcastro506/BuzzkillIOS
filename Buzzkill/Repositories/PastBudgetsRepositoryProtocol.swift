@@ -1,5 +1,7 @@
 import Foundation
+import FirebaseFirestore
 
 protocol PastBudgetsRepositoryProtocol {
-    func fetchPastBudgets(page: Int, size: Int, completion: @escaping ([PastBudget]) -> Void)
+    func fetchUserPastBudgets(userId: String, completion: @escaping ([PastBudget]?, Error?) -> Void)
+    func fetchPastBudgets(lastDocument: DocumentSnapshot?, size: Int, completion: @escaping ([PastBudget], DocumentSnapshot?) -> Void)
 } 

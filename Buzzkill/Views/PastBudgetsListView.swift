@@ -2,9 +2,13 @@ import SwiftUI
 
 struct PastBudgetsListView: View {
     @EnvironmentObject var authService: AuthService
-    @StateObject private var viewModel = PastBudgetsViewModel()
+    @StateObject private var viewModel: PastBudgetsViewModel
     @State private var selectedBudget: PastBudget?
     @State private var showBudgetDetail = false
+
+    init(viewModel: PastBudgetsViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     // Define grid layout for two columns
     private let columns: [GridItem] = [
@@ -42,11 +46,6 @@ struct PastBudgetsListView: View {
                         if viewModel.isLoading {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
-                        } else {
-                            Color.clear
-                                .onAppear {
-                                    viewModel.loadMoreBudgets()
-                                }
                         }
                     }
                     .padding(.horizontal, 16) // Ensure proper padding around grid
@@ -65,7 +64,7 @@ struct PastBudgetsListView: View {
         }
         .onAppear {
             if viewModel.pastBudgets.isEmpty {
-                viewModel.loadInitialBudgets()
+                viewModel.fetchAllUserPastBudgets(userId: authService.user?.id ?? "")
             }
         }
     }
@@ -158,7 +157,7 @@ struct PastBudgetsListView_Previews: PreviewProvider {
         )
         sampleBudgetModel.pastBudgets = [pastBudget]
         
-        return PastBudgetsListView()
+        return PastBudgetsListView(viewModel: PastBudgetsViewModel(authService: AuthService(), pastBudgetsRepository: PastBudgetsRepository.shared))
             .environmentObject(AuthService())
             .preferredColorScheme(.dark)
     }

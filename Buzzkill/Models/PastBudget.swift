@@ -1,16 +1,16 @@
 import Foundation
 
 struct PastBudget: Identifiable {
-    let id: UUID
-    let userId: String
-    let totalAmount: Double
-    let spentAmount: Double
-    let name: String
-    let startDate: Date
-    let endDate: Date
-    let isRecurring: Bool
-    let status: String
-    let transactions: [Transaction]
+    var id: UUID
+    var userId: String
+    var totalAmount: Double
+    var spentAmount: Double
+    var name: String
+    var startDate: Date
+    var endDate: Date
+    var isRecurring: Bool
+    var status: String
+    var transactions: [Transaction]
 
     var isUnderBudget: Bool {
         return spentAmount <= totalAmount
@@ -39,34 +39,31 @@ struct PastBudget: Identifiable {
         ]
     }
     
-    static func fromDictionary(_ dict: [String: Any]) -> PastBudget? {
-        guard let idString = dict["id"] as? String,
-              let id = UUID(uuidString: idString),
-              let userId = dict["userId"] as? String,
-              let totalAmount = dict["totalAmount"] as? Double,
-              let spentAmount = dict["spentAmount"] as? Double,
-              let name = dict["name"] as? String,
-              let startDateTimestamp = dict["startDate"] as? TimeInterval,
-              let endDateTimestamp = dict["endDate"] as? TimeInterval,
-              let isRecurring = dict["isRecurring"] as? Bool,
-              let status = dict["status"] as? String else {
+    static func fromDictionary(_ data: [String: Any]) -> PastBudget? {
+        guard let idString = data["id"] as? String,
+              let uuid = UUID(uuidString: idString),
+              let userId = data["userId"] as? String,
+              let totalAmount = data["totalAmount"] as? Double,
+              let spentAmount = data["spentAmount"] as? Double,
+              let name = data["name"] as? String,
+              let startDate = data["startDate"] as? TimeInterval,
+              let endDate = data["endDate"] as? TimeInterval,
+              let isRecurring = data["isRecurring"] as? Bool,
+              let status = data["status"] as? String,
+              let transactionsData = data["transactions"] as? [[String: Any]] else {
             return nil
         }
 
-        let startDate = Date(timeIntervalSince1970: startDateTimestamp)
-        let endDate = Date(timeIntervalSince1970: endDateTimestamp)
-
-        let transactionsData = dict["transactions"] as? [[String: Any]] ?? []
         let transactions = transactionsData.compactMap { Transaction.fromDictionary($0) }
 
         return PastBudget(
-            id: id,
+            id: uuid,
             userId: userId,
             totalAmount: totalAmount,
             spentAmount: spentAmount,
             name: name,
-            startDate: startDate,
-            endDate: endDate,
+            startDate: Date(timeIntervalSince1970: startDate),
+            endDate: Date(timeIntervalSince1970: endDate),
             isRecurring: isRecurring,
             status: status,
             transactions: transactions

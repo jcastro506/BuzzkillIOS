@@ -20,7 +20,7 @@ struct MainTabView: View {
                 }
                 .tag(1)
 
-            PastBudgetsListView()
+            PastBudgetsListView(viewModel: PastBudgetsViewModel(authService: authService, pastBudgetsRepository: PastBudgetsRepository.shared))
                 .tabItem {
                     Image(systemName: "clock.fill")
                     Text("Past Budgets")

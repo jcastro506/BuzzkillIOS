@@ -1,59 +1,64 @@
 import Foundation
+import FirebaseFirestore
 
 class PastBudgetsRepository: PastBudgetsRepositoryProtocol {
+    
     static let shared = PastBudgetsRepository()
 
-    func fetchPastBudgets(page: Int, size: Int, completion: @escaping ([PastBudget]) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            let budgets = self.generateDummyBudgets(page: page, size: size)
-            completion(budgets)
+    private let db = FirestoreManager.shared.db
+
+    func fetchPastBudgets(lastDocument: DocumentSnapshot?, size: Int, completion: @escaping ([PastBudget], DocumentSnapshot?) -> Void) {
+        var query: Query = db.collection("past_budgets")
+            .order(by: "startDate", descending: true)
+            .limit(to: size)
+
+        if let lastDocument = lastDocument {
+            query = query.start(afterDocument: lastDocument)
+        }
+
+        query.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error fetching past budgets: \(error.localizedDescription)")
+                completion([], nil)
+                return
+            }
+            
+            if let documents = querySnapshot?.documents {
+                let pastBudgets = documents.compactMap { document -> PastBudget? in
+                    let data = document.data()
+                    return PastBudget.fromDictionary(data)
+                }
+                let lastDocument = documents.last
+                completion(pastBudgets, lastDocument)
+            } else {
+                print("No past budgets found")
+                completion([], nil)
+            }
         }
     }
 
-    private func generateDummyBudgets(page: Int, size: Int) -> [PastBudget] {
-        let barNames = [
-            "The Tipsy Tavern", "Neon Nights", "The Rusty Nail", 
-            "Moonlight Lounge", "The Happy Hour", "The Drunken Duck", 
-            "The Buzz Bar", "The Liquid Lounge", "The Velvet Room", 
-            "The Whiskey Way"
-        ]
+    func fetchUserPastBudgets(userId: String, completion: @escaping ([PastBudget]?, Error?) -> Void) {
+        let pastBudgetsRef = db.collection("past_budgets").whereField("userId", isEqualTo: userId)
         
-        var budgets: [PastBudget] = []
-        
-        for index in 0..<size {
-            let barName = barNames[(page * size + index) % barNames.count]
-            let totalAmount = Double.random(in: 500...1000)
-            let spentAmount = Double.random(in: 50...500)
-            let transactions = generateDummyTransactions()
+        pastBudgetsRef.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error fetching past budgets: \(error.localizedDescription)")
+                completion(nil, error)
+                return
+            }
             
-            let budget = PastBudget(
-                id: UUID(),
-                userId: "sampleUserId",
-                totalAmount: totalAmount,
-                spentAmount: spentAmount,
-                name: barName,
-                startDate: Date(),
-                endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date(),
-                isRecurring: false,
-                status: "completed",
-                transactions: transactions
-            )
-            
-            budgets.append(budget)
+            if let documents = querySnapshot?.documents {
+                let pastBudgets = documents.compactMap { document -> PastBudget? in
+                    let data = document.data()
+                    return PastBudget.fromDictionary(data)
+                }
+                completion(pastBudgets, nil)
+            } else {
+                print("No past budgets found for userId: \(userId)")
+                completion([], nil)
+            }
         }
-        
-        return budgets
     }
 
-    private func generateDummyTransactions() -> [Transaction] {
-        return (0..<5).map { index in
-            Transaction(
-                id: UUID(),
-                amount: Double.random(in: 10...100),
-                date: Date(),
-                description: "Transaction \(index + 1)",
-                name: "Transaction Name \(index + 1)"
-            )
-        }
-    }
+    // Implement other methods required by the protocol
 } 
